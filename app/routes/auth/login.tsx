@@ -31,7 +31,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const { mutateAsync, isPending, isError, error } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationFn: async (data: LoginPayload) => {
       const response = await request.post("/auth/login", data);
       return response.data;
@@ -53,13 +53,7 @@ const Login = () => {
     },
     validationSchema: loginSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      try {
-        await mutateAsync(values);
-      } catch (err) {
-        // error handled via mutation state
-      } finally {
-        setSubmitting(false);
-      }
+      mutate(values);
     },
   });
 

@@ -10,15 +10,35 @@ export const request = axios.create({
   withCredentials: true, // needed for refresh cookie
 });
 
-// request.interceptors.request.use((config) => {
-//   const token = tokenStore.getAccessToken();
+const authRoutes = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/refresh",
+  "/auth/google",
+  "/verify-email",
+  "/resend-verification",
+];
 
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
+// ✅ REQUEST INTERCEPTOR
+request.interceptors.request.use((config) => {
+  const token = tokenStore.getAccessToken();
 
-//   return config;
-// });
+  console.log("CONFIG URL", config.url);
+
+  const isAuthRoute = authRoutes.some((route) =>
+    config.url?.includes(route)
+  );
+
+  console.log("IS AUTH ROUTE?", isAuthRoute);
+
+  if (token && !isAuthRoute) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
@@ -35,56 +55,61 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-// request.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
+request.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-//     if (
-//       error.response?.status === 401 &&
-//       !originalRequest._retry
-//     ) {
-//       if (isRefreshing) {
-//         return new Promise((resolve, reject) => {
-//           failedQueue.push({ resolve, reject });
-//         }).then((token) => {
-//           originalRequest.headers.Authorization = `Bearer ${token}`;
-//           return request(originalRequest);
-//         });
-//       }
+    const isAuthRoute = authRoutes.some((route) =>
+      originalRequest.url?.includes(route)
+    );
 
-//       originalRequest._retry = true;
-//       isRefreshing = true;
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry && 
+      !isAuthRoute
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return request(originalRequest);
+        });
+      }
 
-//       try {
-//         const response = await axios.post(
-//           `${baseUrl}/auth/refresh`,
-//           {},
-//           { withCredentials: true }
-//         );
+      originalRequest._retry = true;
+      isRefreshing = true;
 
-//         const newAccessToken = response.data.accessToken;
+      try {
+        const response = await axios.post(
+          `${baseUrl}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
 
-//         tokenStore.setAccessToken(newAccessToken);
+        const newAccessToken = response.data.accessToken;
 
-//         processQueue(null, newAccessToken);
+        tokenStore.setAccessToken(newAccessToken);
 
-//         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-//         return request(originalRequest);
-//       } catch (refreshError) {
-//         processQueue(refreshError, null);
+        processQueue(null, newAccessToken);
 
-//         tokenStore.setAccessToken(null);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return request(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
 
-//         // Optional: redirect to login
-//         window.location.href = "/login";
+        tokenStore.setAccessToken(null);
 
-//         return Promise.reject(refreshError);
-//       } finally {
-//         isRefreshing = false;
-//       }
-//     }
+        // Optional: redirect to login
+        window.location.href = "/login";
 
-//     return Promise.reject(error);
-//   }
-// );
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
