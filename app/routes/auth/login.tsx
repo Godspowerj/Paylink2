@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, redirect, useFetcher, useNavigate } from 'react-router';
 // import { useAuth } from '@/hooks/useAuth';
-import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -13,6 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { cn } from '~/lib/utils';
 import { PasswordInput } from '~/components/ui/password-input';
 import { ErrorFeedback } from '~/components/toast';
+import { tokenStore } from '~/services/token-store';
 
 interface LoginPayload {
   email: string;
@@ -27,9 +27,31 @@ const loginSchema = Yup.object({
     .required("Password is required"),
 });
 
+// export async function action({
+//   request,
+// }: Route.ActionArgs) {
+//   let formData = await request.formData();
+
+//   console.log(formData.get("mode"))
+//   const session = await getSession(
+//     request.headers.get("Cookie"),
+//   );
+
+//   let access_token = formData.get("access_token") as string;
+
+//   session.set("access_token", access_token);
+
+//   return redirect("/dashboard", {
+//     headers: {
+//       "Set-Cookie": await commitSession(session),
+//     },
+//   });
+// }
+
 const Login = () => {
 
   const navigate = useNavigate();
+
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: async (data: LoginPayload) => {
@@ -37,8 +59,16 @@ const Login = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log("Login successful:", data);
-      navigate("/dashboard");
+      console.log("Login successful!", data);
+      // Store the access token in localStorage
+      tokenStore.setAccessToken(data.data.accessToken);
+      
+      setTimeout(() => {
+        console.log("Running timeout")
+        // Redirect to dashboard
+        navigate("/dashboard"); 
+      }, 500);
+      console.log(data.message);
     },
   });
 

@@ -25,13 +25,9 @@ const authRoutes = [
 request.interceptors.request.use((config) => {
   const token = tokenStore.getAccessToken();
 
-  console.log("CONFIG URL", config.url);
-
   const isAuthRoute = authRoutes.some((route) =>
     config.url?.includes(route)
   );
-
-  console.log("IS AUTH ROUTE?", isAuthRoute);
 
   if (token && !isAuthRoute) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -102,7 +98,7 @@ request.interceptors.response.use(
         tokenStore.setAccessToken(null);
 
         // Optional: redirect to login
-        window.location.href = "/login";
+        // window.location.href = "/login";
 
         return Promise.reject(refreshError);
       } finally {

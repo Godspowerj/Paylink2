@@ -1,10 +1,12 @@
 // lib/tokenStore.ts
 
-let accessToken: string | null = null;
-
 export const tokenStore = {
-    getAccessToken: () => accessToken,
+    getAccessToken: () => localStorage.getItem("access_token"),
     setAccessToken: (token: string | null) => {
-        accessToken = token;
+        if (token) {
+            localStorage.setItem("access_token", token);
+        } else {
+            localStorage.removeItem("access_token");
+        }
     },
 };

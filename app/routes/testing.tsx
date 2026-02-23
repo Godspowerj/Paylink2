@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { Plus } from "lucide-react";
 
-export default function Dashboard() {
+export default function Testing() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

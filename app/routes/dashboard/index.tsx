@@ -21,12 +21,20 @@ import 'swiper/css/free-mode';
 import 'swiper/css/pagination';
 
 // import required modules
-import { useNavigate } from "react-router";
+import { data, useNavigate } from "react-router";
+import { useAuth } from "~/contexts/auth";
+import DashboardShimmer from "~/components/shimmers/dashboard-shimmer";
 
 
 export default function Dashboard() {
-    
+
+    const { isLoading, user} = useAuth();
+
     const navigate = useNavigate();
+
+    if(isLoading){
+        return <DashboardShimmer />
+    }
 
     return (
         <AppLayout>
