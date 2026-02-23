@@ -1,4 +1,3 @@
-import type { Route } from "./+types/home";
 import { Link } from "react-router";
 import {
    Link2, ArrowRight, Shield, Zap, Users, BarChart3,
@@ -20,12 +19,12 @@ import TypingAnimation from "~/components/magicui/typing-animation";
 import { PaymentWorkflowVisual } from "~/components/payment-workflow-visual";
 import { InfinitePossibilities } from "~/components/infinite-possibilities";
 
-export function meta({ }: Route.MetaArgs) {
-   return [
-      { title: "Paylink — Payment collection reimagined." },
-      { name: "description", content: "Collect payments with a single link. No coding, no hassle." },
-   ];
-}
+// export function meta({ }: Route.MetaArgs) {
+//    return [
+//       { title: "Paylink — Payment collection reimagined." },
+//       { name: "description", content: "Collect payments with a single link. No coding, no hassle." },
+//    ];
+// }
 
 /* ═══════════════════════════════════════════
    COMPONENTS
