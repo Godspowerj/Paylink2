@@ -24,17 +24,14 @@ import 'swiper/css/pagination';
 import { data, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/auth";
 import DashboardShimmer from "~/components/shimmers/dashboard-shimmer";
+import { getGreeting } from "~/lib/utils";
 
 
 export default function Dashboard() {
 
-    const { isLoading, user} = useAuth();
+    const { user} = useAuth();
 
     const navigate = useNavigate();
-
-    if(isLoading){
-        return <DashboardShimmer />
-    }
 
     return (
         <AppLayout>
@@ -44,7 +41,7 @@ export default function Dashboard() {
                 <div className="hidden lg:flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-                            Good morning, Kiisifelix
+                            {getGreeting()}, {user.firstName}
                         </h1>
                         <p className="text-sm text-gray-500 mt-1">
                             Track collections and monitor payments in real-time

@@ -24,12 +24,9 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
 
   const { user } = useAuth();
 
-  console.log("APP LAYOUT => USER", user);
-
   const location = useLocation();
 
   const [open, setMobileOpen] = useState(false);
-
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
