@@ -68,10 +68,10 @@ const Profile = () => {
   const { mutate, isPending, isError, error, data, isSuccess } = useMutation({
     mutationFn: async (data: BusinessProfileValues) => {
       // Updated Business Profile
-      // if (user.business) {
-      //   const response = await request.put("/businesses/me", data);
-      //   return response.data;
-      // }
+      if (user.business) {
+        const response = await request.put("/businesses/me", data);
+        return response.data;
+      }
       // Create Business Profile
       const response = await request.post("/businesses", data);
       return response.data;
@@ -83,7 +83,8 @@ const Profile = () => {
     },
   });
 
-  const areFormFieldsDisabled = !!user.business
+  const [formFieldsEditable, setFormFieldsEditable] = useState(!!user.business);
+  const isEmailFieldDisabled = !!user.business
 
   const formik = useFormik({
     initialValues: {
@@ -131,11 +132,13 @@ const Profile = () => {
       <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
         {/* Profile */}
         <section>
-          {/* <div className="mb-4 flex justify-between gap-4">
+          <div className="mb-4 flex justify-between gap-4">
             <h2 className="text-lg font-semibold text-foreground">Profile</h2>
             {
               user.business ? (
-                <button className="cursor-pointer border border-[#DAE0E6] hover:border-primary px-3 rounded-sm text-[14px] leading-[100%] h-[32px] inline-flex gap-2 items-center bg-white text-gray-500 hover:text-white hover:bg-primary transition">
+                <button
+                  onClick={() => setFormFieldsEditable(prev => !prev)}
+                  className="cursor-pointer border border-[#DAE0E6] hover:border-primary px-3 rounded-sm text-[14px] leading-[100%] h-[32px] inline-flex gap-2 items-center bg-white text-gray-500 hover:text-white hover:bg-primary transition">
                   <Edit2 size={14} />
                   Edit
                 </button>
@@ -143,9 +146,6 @@ const Profile = () => {
                 <div>{" "}</div>
               )
             }
-          </div> */}
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Profile</h2>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-5">
             <div>
@@ -153,7 +153,7 @@ const Profile = () => {
               <Input
                 id="name"
                 placeholder="Enter business or group name"
-                disabled={areFormFieldsDisabled}
+                disabled={formFieldsEditable}
                 {...formik.getFieldProps("name")}
                 className={cn(
                   "mt-1",
@@ -174,7 +174,7 @@ const Profile = () => {
                 id="businessEmail"
                 type="email"
                 placeholder="you@example.com"
-                disabled={areFormFieldsDisabled}
+                disabled={isEmailFieldDisabled}
                 {...formik.getFieldProps("businessEmail")}
                 className={cn(
                   "mt-1",
@@ -194,7 +194,7 @@ const Profile = () => {
               <Input
                 id="phone"
                 placeholder="Enter your phone number"
-                disabled={areFormFieldsDisabled}
+                disabled={formFieldsEditable}
                 {...formik.getFieldProps("phone")}
                 className={cn(
                   "mt-1",
@@ -213,8 +213,8 @@ const Profile = () => {
               <Label htmlFor="address">Business Address</Label>
               <Input
                 id="address"
-                placeholder="Enter business address"
-                disabled={areFormFieldsDisabled}
+                placeholder="Enter business"
+                disabled={formFieldsEditable}
                 {...formik.getFieldProps("address")}
                 className={cn(
                   "mt-1",
