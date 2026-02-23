@@ -68,10 +68,10 @@ const Profile = () => {
   const { mutate, isPending, isError, error, data, isSuccess } = useMutation({
     mutationFn: async (data: BusinessProfileValues) => {
       // Updated Business Profile
-      if (user.business) {
-        const response = await request.put("/businesses/me", data);
-        return response.data;
-      }
+      // if (user.business) {
+      //   const response = await request.put("/businesses/me", data);
+      //   return response.data;
+      // }
       // Create Business Profile
       const response = await request.post("/businesses", data);
       return response.data;
@@ -82,6 +82,8 @@ const Profile = () => {
       console.log(data.message);
     },
   });
+
+  const areFormFieldsDisabled = !!user.business
 
   const formik = useFormik({
     initialValues: {
@@ -129,7 +131,7 @@ const Profile = () => {
       <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
         {/* Profile */}
         <section>
-          <div className="mb-4 flex justify-between gap-4">
+          {/* <div className="mb-4 flex justify-between gap-4">
             <h2 className="text-lg font-semibold text-foreground">Profile</h2>
             {
               user.business ? (
@@ -141,13 +143,17 @@ const Profile = () => {
                 <div>{" "}</div>
               )
             }
+          </div> */}
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-foreground">Profile</h2>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-5">
             <div>
               <Label htmlFor="orgName">Business/Group Name</Label>
               <Input
                 id="name"
-                placeholder="John Doe"
+                placeholder="Enter business or group name"
+                disabled={areFormFieldsDisabled}
                 {...formik.getFieldProps("name")}
                 className={cn(
                   "mt-1",
@@ -168,6 +174,7 @@ const Profile = () => {
                 id="businessEmail"
                 type="email"
                 placeholder="you@example.com"
+                disabled={areFormFieldsDisabled}
                 {...formik.getFieldProps("businessEmail")}
                 className={cn(
                   "mt-1",
@@ -186,7 +193,8 @@ const Profile = () => {
               <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
-                placeholder="+1234567890"
+                placeholder="Enter your phone number"
+                disabled={areFormFieldsDisabled}
                 {...formik.getFieldProps("phone")}
                 className={cn(
                   "mt-1",
@@ -205,7 +213,8 @@ const Profile = () => {
               <Label htmlFor="address">Business Address</Label>
               <Input
                 id="address"
-                placeholder="123 Business Street"
+                placeholder="Enter business address"
+                disabled={areFormFieldsDisabled}
                 {...formik.getFieldProps("address")}
                 className={cn(
                   "mt-1",
@@ -231,13 +240,7 @@ const Profile = () => {
               disabled={isPending || !formik.isValid}
               isLoading={isPending}
             >
-              {
-                user.business ? (
-                  "Save Changes"
-                ) : (
-                  "Create Business Profile"
-                )
-              }
+              Create Business Profile
             </Button>
           </form>
         </section>
