@@ -2,18 +2,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useState, useEffect } from "react";
 import { Nav } from "react-day-picker";
 import { Navigate, useLocation, useNavigate } from "react-router";
+import type { User } from "~/@types";
 import AuthenticatedPageShimmer from "~/components/shimmers/authenticated-page-shimmer";
 import { request } from "~/services/request";
 import { tokenStore } from "~/services/token-store";
 
-export interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role?: string;
-    // add any other fields your API returns
-}
+
 
 interface AuthContextType {
     isAuthenticated: boolean;

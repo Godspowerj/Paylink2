@@ -88,8 +88,8 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
                 />
               </figure>
               <div
-                className="text-[14px] max-w-[90px] truncate text-left hidden md:block">
-                Kiisifelix
+                className="text-[14px] min-w-[40px] max-w-[90px] truncate text-left hidden md:block">
+                {user.firstName}
               </div>
               <ChevronDownIcon className="hidden md:block" />
               <MenuIcon
@@ -105,7 +105,7 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
       <div className={cn("fixed inset-0 z-[7788]", open ? "visible" : "invisible")}>
         <div
           onClick={onClose}
-          className={`fixed w-full h-screen inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 touch-none z-[8888] ${open ? "opacity-100 visible" : "opacity-0 invisible"
+          className={`fixed w-full h-screen inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 touch-none z-[8888] ${open ? "opacity-100 visible" : "opacity-0 invisible"
             }`}
         />
         <div
