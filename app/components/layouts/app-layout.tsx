@@ -58,7 +58,10 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
                 className="rounded-full h-[40px] w-[40px] object-cover"
               />
             </figure> */}
-            <div className="h-[40px] w-[40px] bg-blue-600 rounded-full flex items-center justify-center text-white -shadow-sm -shadow-blue-200">
+            <div
+              onClick={() => setMobileOpen(previous => !previous)}
+              className="h-[40px] w-[40px] bg-blue-600 rounded-full flex items-center justify-center text-white -shadow-sm -shadow-blue-200"
+            >
               <Link2 size={20} className="-rotate-45" />
               {/* <LinkIcon size={20} className="- srotate-45" /> */}
             </div>

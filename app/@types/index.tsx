@@ -4,9 +4,14 @@ export interface User {
     lastName: string;
     email: string;
     role?: string;
-    business?: {
-        id: string;
-        name: string;
-    } | null;
+    business?: BusinessProfileValues| null;
     // add any other fields your API returns
+}
+
+export interface BusinessProfileValues {
+  name: string
+  businessEmail: string
+  phone: string
+  address: string
+  logo?: string | null
 }

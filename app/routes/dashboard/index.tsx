@@ -23,7 +23,6 @@ import 'swiper/css/pagination';
 // import required modules
 import { data, Link, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/auth";
-import DashboardShimmer from "~/components/shimmers/dashboard-shimmer";
 import { getGreeting } from "~/lib/utils";
 
 
@@ -37,7 +36,6 @@ export default function Dashboard() {
         <AppLayout>
             <div className="space-y-10">
 
-
                 {
                     user.business == null && (
                         <div className="w-full bg-[#FFFAEB] flex justify-start items-start gap-3 px-3 py-4 rounded-xl border border-[#FFE4A8]">
@@ -49,7 +47,7 @@ export default function Dashboard() {
                                 <p className="mt-1 text-sm">
                                     Set up your business profile to start creating and managing collections. {" "}
                                     <Link
-                                        to="/settings/business"
+                                        to="/profile"
                                         className="text-[#B45309] hover:underline decoration-[#B45309] hover:text-[#92400E] hover:decoration-[#92400E] transition-colors duration-150 cursor-pointer italic"
                                     >
                                         Set up now.

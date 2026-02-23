@@ -60,7 +60,7 @@ const Login = () => {
       password: "",
     },
     validationSchema: loginSchema,
-    onSubmit: async (values, { setSubmitting }) => {
+    onSubmit: (values) => {
       mutate(values);
     },
   });
