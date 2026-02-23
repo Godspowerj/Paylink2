@@ -61,8 +61,22 @@ const bankDetailsSchema = Yup.object({
     .required("Account name is required"),
 })
 
-const Profile = () => {
+export default function Profile() {
 
+  return (
+    <AppLayout className="bg-[#f4f5f6]">
+      <h1 className="mb-1 text-2xl font-bold text-foreground">Business Profile</h1>
+      <p className="mb-6 text-sm text-muted-foreground">Manage your business profile and payout details</p>
+
+      <BusinessProfile />
+
+      <BankingInformation />
+      
+    </AppLayout>
+  );
+};
+
+const BusinessProfile = () => {
   const { user } = useAuth();
 
   const { mutate, isPending, isError, error, data, isSuccess } = useMutation({
@@ -100,9 +114,136 @@ const Profile = () => {
       mutate(values)
     },
     validateOnMount: true,
-  })
+  });
 
-  const payoutFormik = useFormik({
+  const errorMessage =
+    (error as any)?.response?.data?.message;
+
+  const successMessage = data?.message;
+
+  return (
+    <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
+      {/* Profile */}
+      <section>
+        <div className="mb-4 flex justify-between gap-4">
+          <h2 className="text-lg font-semibold text-foreground">Profile</h2>
+          {
+            user.business ? (
+              <button
+                onClick={() => setFormFieldsEditable(prev => !prev)}
+                className="cursor-pointer border border-[#DAE0E6] hover:border-primary px-3 rounded-sm text-[14px] leading-[100%] h-[32px] inline-flex gap-2 items-center bg-white text-gray-500 hover:text-white hover:bg-primary transition">
+                <Edit2 size={14} />
+                Edit
+              </button>
+            ) : (
+              <div>{" "}</div>
+            )
+          }
+        </div>
+        <form onSubmit={formik.handleSubmit} className="space-y-5">
+          <div>
+            <Label htmlFor="orgName">Business/Group Name</Label>
+            <Input
+              id="name"
+              placeholder="Enter business or group name"
+              disabled={formFieldsEditable}
+              {...formik.getFieldProps("name")}
+              className={cn(
+                "mt-1",
+                formik.touched.name &&
+                formik.errors.name &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.name && formik.errors.name && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.name}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="businessEmail">Business Email</Label>
+            <Input
+              id="businessEmail"
+              type="email"
+              placeholder="you@example.com"
+              disabled={isEmailFieldDisabled}
+              {...formik.getFieldProps("businessEmail")}
+              className={cn(
+                "mt-1",
+                formik.touched.businessEmail &&
+                formik.errors.businessEmail &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.businessEmail && formik.errors.businessEmail && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.businessEmail}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              placeholder="Enter your phone number"
+              disabled={formFieldsEditable}
+              {...formik.getFieldProps("phone")}
+              className={cn(
+                "mt-1",
+                formik.touched.phone &&
+                formik.errors.phone &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.phone && formik.errors.phone && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.phone}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="address">Business Address</Label>
+            <Input
+              id="address"
+              placeholder="Enter business"
+              disabled={formFieldsEditable}
+              {...formik.getFieldProps("address")}
+              className={cn(
+                "mt-1",
+                formik.touched.address &&
+                formik.errors.address &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.address && formik.errors.address && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.address}
+              </p>
+            )}
+          </div>
+          {isError && (
+            <ErrorFeedback message={errorMessage} />
+          )}
+          {isSuccess && (
+            <SuccessFeedback message={successMessage} />
+          )}
+          <Button
+            className="w-full rounded-[24px] gap-2"
+            disabled={isPending || !formik.isValid}
+            isLoading={isPending}
+          >
+            Create Business Profile
+          </Button>
+        </form>
+      </section>
+    </div>
+  )
+}
+
+const BankingInformation = () => {
+
+  const formik = useFormik({
     initialValues: {
       accountNumber: "",
       bankName: "",
@@ -115,213 +256,83 @@ const Profile = () => {
     validateOnMount: true,
   })
 
-  console.log(isError, error)
-  const errorMessage =
-    (error as any)?.response?.data?.message;
-  console.log(errorMessage)
-
-  console.log("IS Success", isSuccess)
-  console.log("Success", data)
-  const successMessage = data?.message;
-
   return (
-    <AppLayout className="bg-[#f4f5f6]">
-      <h1 className="mb-1 text-2xl font-bold text-foreground">Business Profile</h1>
-      <p className="mb-6 text-sm text-muted-foreground">Manage your business profile and payout details</p>
-
-      <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
-        {/* Profile */}
-        <section>
-          <div className="mb-4 flex justify-between gap-4">
-            <h2 className="text-lg font-semibold text-foreground">Profile</h2>
-            {
-              user.business ? (
-                <button
-                  onClick={() => setFormFieldsEditable(prev => !prev)}
-                  className="cursor-pointer border border-[#DAE0E6] hover:border-primary px-3 rounded-sm text-[14px] leading-[100%] h-[32px] inline-flex gap-2 items-center bg-white text-gray-500 hover:text-white hover:bg-primary transition">
-                  <Edit2 size={14} />
-                  Edit
-                </button>
-              ) : (
-                <div>{" "}</div>
-              )
-            }
+    <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px]">
+      {/* Payout */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-foreground">
+          Banking Information
+        </h2>
+        <form className="space-y-6">
+          <div>
+            <Label htmlFor="account">Account Number</Label>
+            <Input
+              id="accountNumber"
+              placeholder="012345678"
+              {...formik.getFieldProps("accountNumber")}
+              className={cn(
+                "mt-1",
+                formik.touched.accountNumber &&
+                formik.errors.accountNumber &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.accountNumber && formik.errors.accountNumber && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.accountNumber}
+              </p>
+            )}
           </div>
-          <form onSubmit={formik.handleSubmit} className="space-y-5">
-            <div>
-              <Label htmlFor="orgName">Business/Group Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter business or group name"
-                disabled={formFieldsEditable}
-                {...formik.getFieldProps("name")}
-                className={cn(
-                  "mt-1",
-                  formik.touched.name &&
-                  formik.errors.name &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {formik.touched.name && formik.errors.name && (
-                <p className="text-xs text-destructive mt-1">
-                  {formik.errors.name}
-                </p>
+          <div>
+            <Label htmlFor="bank">Select Bank</Label>
+            <Input
+              id="bankName"
+              placeholder="Select Bank"
+              {...formik.getFieldProps("bankName")}
+              className={cn(
+                "mt-1",
+                formik.touched.bankName &&
+                formik.errors.bankName &&
+                "border-destructive focus-visible:ring-destructive"
               )}
-            </div>
-            <div>
-              <Label htmlFor="businessEmail">Business Email</Label>
-              <Input
-                id="businessEmail"
-                type="email"
-                placeholder="you@example.com"
-                disabled={isEmailFieldDisabled}
-                {...formik.getFieldProps("businessEmail")}
-                className={cn(
-                  "mt-1",
-                  formik.touched.businessEmail &&
-                  formik.errors.businessEmail &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {formik.touched.businessEmail && formik.errors.businessEmail && (
-                <p className="text-xs text-destructive mt-1">
-                  {formik.errors.businessEmail}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                placeholder="Enter your phone number"
-                disabled={formFieldsEditable}
-                {...formik.getFieldProps("phone")}
-                className={cn(
-                  "mt-1",
-                  formik.touched.phone &&
-                  formik.errors.phone &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {formik.touched.phone && formik.errors.phone && (
-                <p className="text-xs text-destructive mt-1">
-                  {formik.errors.phone}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="address">Business Address</Label>
-              <Input
-                id="address"
-                placeholder="Enter business"
-                disabled={formFieldsEditable}
-                {...formik.getFieldProps("address")}
-                className={cn(
-                  "mt-1",
-                  formik.touched.address &&
-                  formik.errors.address &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {formik.touched.address && formik.errors.address && (
-                <p className="text-xs text-destructive mt-1">
-                  {formik.errors.address}
-                </p>
-              )}
-            </div>
-            {isError && (
-              <ErrorFeedback message={errorMessage} />
+            />
+            {formik.touched.bankName && formik.errors.bankName && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.bankName}
+              </p>
             )}
-            {isSuccess && (
-              <SuccessFeedback message={successMessage} />
+          </div>
+          <div>
+            <Label htmlFor="bank">Account Name</Label>
+            <Input
+              id="accountName"
+              placeholder="Account Name"
+              {...formik.getFieldProps("accountName")}
+              className={cn(
+                "mt-1",
+                formik.touched.accountName &&
+                formik.errors.accountName &&
+                "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            {formik.touched.accountName && formik.errors.accountName && (
+              <p className="text-xs text-destructive mt-1">
+                {formik.errors.accountName}
+              </p>
             )}
-            <Button
-              className="w-full rounded-[24px] gap-2"
-              disabled={isPending || !formik.isValid}
-              isLoading={isPending}
-            >
-              Create Business Profile
-            </Button>
-          </form>
-        </section>
-      </div>
-
-      <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px]">
-        {/* Payout */}
-        <section>
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Banking Information
-          </h2>
-          <form className="space-y-6">
-            <div>
-              <Label htmlFor="account">Account Number</Label>
-              <Input
-                id="accountNumber"
-                placeholder="012345678"
-                {...payoutFormik.getFieldProps("accountNumber")}
-                className={cn(
-                  "mt-1",
-                  payoutFormik.touched.accountNumber &&
-                  payoutFormik.errors.accountNumber &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {payoutFormik.touched.accountNumber && payoutFormik.errors.accountNumber && (
-                <p className="text-xs text-destructive mt-1">
-                  {payoutFormik.errors.accountNumber}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="bank">Select Bank</Label>
-              <Input
-                id="bankName"
-                placeholder="Select Bank"
-                {...payoutFormik.getFieldProps("bankName")}
-                className={cn(
-                  "mt-1",
-                  payoutFormik.touched.bankName &&
-                  payoutFormik.errors.bankName &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {payoutFormik.touched.bankName && payoutFormik.errors.bankName && (
-                <p className="text-xs text-destructive mt-1">
-                  {payoutFormik.errors.bankName}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="bank">Account Name</Label>
-              <Input
-                id="accountName"
-                placeholder="Account Name"
-                {...payoutFormik.getFieldProps("accountName")}
-                className={cn(
-                  "mt-1",
-                  payoutFormik.touched.accountName &&
-                  payoutFormik.errors.accountName &&
-                  "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {payoutFormik.touched.accountName && payoutFormik.errors.accountName && (
-                <p className="text-xs text-destructive mt-1">
-                  {payoutFormik.errors.accountName}
-                </p>
-              )}
-            </div>
-            <Button
-              // onClick={handleSave}
-              className="w-full gap-2 rounded-[24px]"
-            >
-              Save Changes
-            </Button>
-          </form>
-        </section>
+          </div>
+          <Button
+            // onClick={handleSave}
+            className="w-full gap-2 rounded-[24px]"
+          >
+            Save Changes
+          </Button>
+        </form>
+      </section>
 
 
-        {/* Export & Logout */}
-        {/* <section className="space-y-3">
+      {/* Export & Logout */}
+      {/* <section className="space-y-3">
           <Button variant="outline" className="w-full gap-2">
             <Download size={16} /> Export Payment History
           </Button>
@@ -333,9 +344,6 @@ const Profile = () => {
             <LogOut size={16} /> Logout
           </Button>
         </section> */}
-      </div>
-    </AppLayout>
-  );
-};
-
-export default Profile;
+    </div>
+  )
+}
