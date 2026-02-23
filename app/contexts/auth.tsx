@@ -8,7 +8,8 @@ import { tokenStore } from "~/services/token-store";
 
 export interface User {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     role?: string;
     // add any other fields your API returns
@@ -17,7 +18,7 @@ export interface User {
 interface AuthContextType {
     isAuthenticated: boolean;
     logout: () => void;
-    user: User | null;
+    user: User;
     isLoading: boolean;
 }
 

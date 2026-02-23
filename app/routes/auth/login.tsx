@@ -27,31 +27,9 @@ const loginSchema = Yup.object({
     .required("Password is required"),
 });
 
-// export async function action({
-//   request,
-// }: Route.ActionArgs) {
-//   let formData = await request.formData();
-
-//   console.log(formData.get("mode"))
-//   const session = await getSession(
-//     request.headers.get("Cookie"),
-//   );
-
-//   let access_token = formData.get("access_token") as string;
-
-//   session.set("access_token", access_token);
-
-//   return redirect("/dashboard", {
-//     headers: {
-//       "Set-Cookie": await commitSession(session),
-//     },
-//   });
-// }
-
 const Login = () => {
 
   const navigate = useNavigate();
-
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: async (data: LoginPayload) => {
