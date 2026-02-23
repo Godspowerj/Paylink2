@@ -66,7 +66,7 @@ const Login = () => {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="w-full max-w-xl sm:border sm:border-grey-500 sm:rounded-md sm:px-6 sm:py-10">
         <div className='grid place-items-center'>
           <div className="block text-center text-2xl font-bold text-primary mb-8">
