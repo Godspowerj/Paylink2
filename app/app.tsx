@@ -11,6 +11,7 @@ import CollectionCreate from './routes/dashboard/collections-create';
 import Testing from './routes/testing';
 import { AuthProvider } from './contexts/auth';
 import Dashboard from './routes/dashboard';
+import Notifications from './routes/dashboard/notifications';
 
 
 const Root = () => {
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
           { path: '/collections', element: <Collections /> },
           { path: '/collections/create', element: <CollectionCreate /> },
           { path: '/profile', element: <Profile /> },
+          { path: '/notifications', element: <Notifications /> },
           { path: '/testing', element: <Testing /> },
         ]
       },
