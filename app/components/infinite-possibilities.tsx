@@ -129,7 +129,7 @@ export function InfinitePossibilities() {
                             whileInView={{ opacity: 1, y: 0, rotate: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
-                            className="absolute md:top-[15%] md:right-0 md:mr-[-20px] w-[90%] md:w-[110%] left-[5%] md:left-auto bg-white/80 backdrop-blur-xl rounded-t-[32px] md:rounded-l-[32px] md:rounded-tr-none border border-gray-200/60 shadow-2xl overflow-hidden h-full z-20"
+                            className="absolute md:top-[15%] md:right-0 w-[90%] md:w-full left-[5%] md:left-auto bg-white/80 backdrop-blur-xl rounded-t-[32px] md:rounded-l-[32px] md:rounded-tr-none border border-gray-200/60 shadow-2xl overflow-hidden h-full z-20"
                         >
                             {/* Mockup Header */}
                             <div className="h-14 border-b border-gray-100 flex items-center justify-between px-6 bg-white/50">

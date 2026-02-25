@@ -5,6 +5,18 @@ import {
     CheckCircle2,
     TrendingUp,
     ArrowUpRight,
+    Link2,
+    Share2,
+    Activity,
+    BarChart3,
+    Download,
+    Filter,
+    MoreHorizontal,
+    Clock,
+    ArrowRight,
+    ChevronRight,
+    ExternalLink,
+    Search,
 } from "lucide-react";
 import {
     Users,
@@ -20,331 +32,288 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/pagination';
 
-// import required modules
-import { data, Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/auth";
 import { getGreeting } from "~/lib/utils";
+import { useState } from "react";
 
 
 export default function Dashboard() {
 
     const { user } = useAuth();
-
     const navigate = useNavigate();
+    const [period, setPeriod] = useState<"7d" | "30d" | "90d">("30d");
+    const hasNoBusiness = user.business == null;
 
     return (
         <AppLayout>
-            <div className="space-y-10">
+            <div className="space-y-6 lg:space-y-8 pt-4">
 
-                {
-                    user.business == null && (
-                        <div className="w-full bg-[#FFFAEB] flex justify-start items-start gap-3 px-3 py-4 rounded-xl border border-[#FFE4A8]">
-                            <img src="/dashboard/warning-2.svg" alt="warning" />
-                            <div className="w-full text-sm text-gray-800">
-                                <p className="font-semibold">
-                                    Create Your Business Profile
-                                </p>
-                                <p className="mt-1 text-sm">
-                                    Set up your business profile to start creating and managing collections. {" "}
-                                    <Link
-                                        to="/profile"
-                                        className="text-[#B45309] hover:underline decoration-[#B45309] hover:text-[#92400E] hover:decoration-[#92400E] transition-colors duration-150 cursor-pointer italic"
-                                    >
-                                        Set up now.
-                                    </Link>
-                                </p>
-                            </div>
+                {/* Business Setup Warning */}
+                {hasNoBusiness && (
+                    <div className="w-full bg-[#FFFAEB] flex items-start gap-3 px-4 py-3.5 rounded-xl border border-[#FFE4A8]">
+                        <img src="/dashboard/warning-2.svg" alt="warning" className="mt-0.5" />
+                        <div className="text-sm text-gray-800">
+                            <p className="font-semibold">Create Your Business Profile</p>
+                            <p className="mt-0.5 text-xs">
+                                Set up your business profile to start creating and managing collections.{" "}
+                                <Link to="/profile" className="text-[#B45309] font-semibold hover:underline">Set up now →</Link>
+                            </p>
                         </div>
-                    )
-                }
+                    </div>
+                )}
 
-
-                {/* HEADER */}
-                <div className="hidden lg:flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
+                {/* Header Row */}
+                <div className="flex items-center justify-between">
+                    {/* Greeting — hidden on mobile since the app header already shows it */}
+                    <div className="hidden sm:block">
+                        <h1 className="text-xl lg:text-2xl font-bold text-gray-900 tracking-tight">
                             {getGreeting()}, {user.firstName}
                         </h1>
                         <p className="text-sm text-gray-500 mt-1">
-                            Track collections and monitor payments in real-time
+                            Here's an overview of your collections and payments
                         </p>
                     </div>
-
-                    <button
-                        onClick={() => navigate("/collections/create")}
-                        className="inline-flex justify-center items-center gap-2 bg-primary hover:bg-blue-700 transition text-white px-5 py-3 rounded-[24px] text-sm font-medium"
-                    >
-                        <Plus size={18} />
-                        Create Collection
-                    </button>
-                </div>
-
-                {/* STATS GRID */}
-                <Swiper
-                    slidesPerView={1.20}
-                    spaceBetween={16}
-                    pagination={{
-                        clickable: true,
-                    }}
-                    className=""
-                    breakpoints={{
-                        640: {
-                            slidesPerView: 2.2,
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: 3.2,
-                        },
-                        1084: {
-                            slidesPerView: 4,
-                        },
-                    }}
-                >
-                    <SwiperSlide>
-                        {/* TOTAL COLLECTED */}
-                        <div className="bg-white border border-gray-200 rounded-xl p-6 transition">
-                            <div className="flex items-center justify-between">
-                                <div className="p-3 rounded-xl bg-blue-50">
-                                    <Wallet className="text-blue-600" size={20} />
-                                </div>
-                                <div className="flex items-center text-green-600 text-sm font-medium gap-1">
-                                    <TrendingUp size={16} />
-                                    +12.4%
-                                </div>
-                            </div>
-
-                            <div className="mt-6">
-                                <p className="text-sm text-gray-500">Total Collected</p>
-                                <h2 className="text-2xl font-semibold mt-1 text-gray-900">
-                                    ₦1,250,000
-                                </h2>
-                            </div>
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                        <div className="flex bg-gray-100 rounded-full p-1">
+                            {(["7d", "30d", "90d"] as const).map(p => (
+                                <button
+                                    key={p}
+                                    onClick={() => setPeriod(p)}
+                                    className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all ${period === p ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                >
+                                    {p === "7d" ? "7 Days" : p === "30d" ? "30 Days" : "90 Days"}
+                                </button>
+                            ))}
                         </div>
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        {/* ACTIVE COLLECTIONS */}
-                        <div className="bg-white border border-gray-200 rounded-xl p-6 transition">
-                            <div className="flex items-center justify-between">
-                                <div className="p-3 rounded-xl bg-purple-50">
-                                    <Layers className="text-purple-600" size={20} />
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                    4 running
-                                </span>
-                            </div>
-
-                            <div className="mt-6">
-                                <p className="text-sm text-gray-500">Active Collections</p>
-                                <h2 className="text-2xl font-semibold mt-1 text-gray-900">
-                                    4
-                                </h2>
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        {/* CLOSED COLLECTIONS */}
-                        <div className="bg-white border border-gray-200 rounded-xl p-6 transition">
-                            <div className="flex items-center justify-between">
-                                <div className="p-3 rounded-xl bg-green-50">
-                                    <CheckCircle2 className="text-green-600" size={20} />
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                    Lifetime
-                                </span>
-                            </div>
-
-                            <div className="mt-6">
-                                <p className="text-sm text-gray-500">Closed Collections</p>
-                                <h2 className="text-2xl font-semibold mt-1 text-gray-900">
-                                    12
-                                </h2>
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        {/* CONTRIBUTORS */}
-                        <div className="bg-white border border-gray-200 rounded-xl p-6 transition">
-                            <div className="flex items-center justify-between">
-                                <div className="p-3 rounded-xl bg-indigo-50">
-                                    <Users className="text-indigo-600" size={22} />
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                    Contributors
-                                </span>
-                            </div>
-
-                            <div className="mt-6">
-                                <p className="text-sm text-gray-500">Total Contributors</p>
-                                <h2 className="text-2xl font-semibold mt-1 text-gray-900">
-                                    186
-                                </h2>
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                </Swiper>
-
-                {/* COLLECTIONS SECTION */}
-                <div className="space-y-6 rounded-2xl">
-
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                            Active Collections
-                        </h2>
-
-                        <button className="text-sm font-medium text-blue-600 hover:underline">
-                            View All
+                        <button
+                            onClick={() => navigate("/collections/create")}
+                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors"
+                        >
+                            <Plus size={16} strokeWidth={2.5} />
+                            <span className="hidden sm:inline">Create Collection</span>
+                            <span className="sm:hidden">Create</span>
                         </button>
                     </div>
-
-                    <div className="space-y-5">
-
-                        {[1, 2].map((_, i) => (
-                            <div
-                                key={i}
-                                className="bg-white border border-gray-200 rounded-xl p-6 transition"
-                            >
-
-                                {/* TOP ROW */}
-                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-                                    <div>
-                                        <div className="flex items-center gap-3">
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                Final Year Project Dues
-                                            </h3>
-
-                                            <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                                                Active
-                                            </span>
-                                        </div>
-
-                                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
-
-                                            <div className="flex items-center gap-1">
-                                                <Users size={16} />
-                                                32 contributors
-                                            </div>
-
-                                            <div className="flex items-center gap-1">
-                                                <Calendar size={16} />
-                                                Deadline: Mar 20, 2026
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    {/* ACTION BUTTONS */}
-                                    <div className="flex items-center gap-3">
-                                        <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900">
-                                            <Copy size={16} />
-                                            Copy Link
-                                        </button>
-
-                                        <button className="flex items-center gap-1 text-sm text-blue-600 font-medium hover:underline">
-                                            <Eye size={16} />
-                                            View
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* PROGRESS SECTION */}
-                                <div className="mt-6">
-
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-sm text-gray-500">
-                                                Amount Collected
-                                            </p>
-                                            <p className="text-xl font-semibold text-gray-900 mt-1">
-                                                ₦300,000
-                                            </p>
-                                        </div>
-
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-500">
-                                                Target
-                                            </p>
-                                            <p className="text-lg font-medium text-gray-900 mt-1">
-                                                ₦500,000
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="mt-4">
-                                        <div className="w-full bg-gray-100 rounded-full h-2">
-                                            <div
-                                                className="bg-blue-600 h-2 rounded-full transition-all"
-                                                style={{ width: "60%" }}
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-between mt-2 text-xs text-gray-500">
-                                            <span>60% completed</span>
-                                            <span>₦200,000 remaining</span>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        ))}
-
-                    </div>
                 </div>
-                {/* RECENT PAYMENTS */}
-                <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
 
-                    <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-900">
-                            Recent Payments
-                        </h2>
-                    </div>
+                {/* KPI Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+                    {[
+                        { label: "Total Collected", value: "₦1,250,000", change: "+12.4%", changeUp: true, icon: Wallet, iconBg: "bg-blue-50", iconColor: "text-blue-600", sub: "from 186 contributors" },
+                        { label: "Active Collections", value: "4", change: "2 near goal", changeUp: true, icon: Layers, iconBg: "bg-purple-50", iconColor: "text-purple-600", sub: "₦485,000 pending" },
+                        { label: "Completed", value: "12", change: "100% success", changeUp: true, icon: CheckCircle2, iconBg: "bg-green-50", iconColor: "text-green-600", sub: "₦2.4M total collected" },
+                        { label: "Contributors", value: "186", change: "+24 this month", changeUp: true, icon: Users, iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "89% completion rate" },
+                    ].map((stat, i) => (
+                        <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 lg:p-5 hover:border-gray-200 transition-colors group">
+                            <div className="flex items-center justify-between">
+                                <div className={`p-2 lg:p-2.5 rounded-xl ${stat.iconBg}`}>
+                                    <stat.icon className={stat.iconColor} size={18} />
+                                </div>
+                                <div className="flex items-center gap-1 text-[10px] lg:text-xs font-medium text-green-600">
+                                    <TrendingUp size={12} />
+                                    {stat.change}
+                                </div>
+                            </div>
+                            <div className="mt-3 lg:mt-4">
+                                <p className="text-xs lg:text-sm text-gray-500">{stat.label}</p>
+                                <h3 className="text-lg lg:text-2xl font-bold text-gray-900 mt-1 tracking-tight">{stat.value}</h3>
+                                <p className="text-[10px] lg:text-[11px] text-gray-400 mt-1 hidden sm:block">{stat.sub}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-                    <div className="divide-y divide-gray-100">
+                {/* Two-Column Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+                    {/* Left Column — Active Collections (2/3 width on desktop) */}
+                    <div className="hidden lg:block lg:col-span-2 bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                        <div className="flex items-center justify-between p-4 lg:p-5 border-b border-gray-100">
+                            <div>
+                                <h2 className="text-sm lg:text-base font-semibold text-gray-900">Active Collections</h2>
+                                <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Monitor and manage active collections</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition hidden sm:block">
+                                    <Search size={16} />
+                                </button>
+                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition hidden sm:block">
+                                    <Filter size={16} />
+                                </button>
+                                <Link to="/collections" className="text-xs text-blue-600 font-medium hover:underline ml-2">
+                                    View All →
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Table Header — hidden on mobile */}
+                        <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50/80 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                            <div className="col-span-4">Collection</div>
+                            <div className="col-span-2 text-right">Collected</div>
+                            <div className="col-span-2 text-right">Target</div>
+                            <div className="col-span-2 text-center">Progress</div>
+                            <div className="col-span-2 text-right">Actions</div>
+                        </div>
+
+                        {/* Collection Rows */}
                         {[
-                            {
-                                name: "David Musa",
-                                collection: "Project Dues",
-                                amount: "₦20,000",
-                                date: "Feb 14, 2026",
-                            },
-                            {
-                                name: "Grace John",
-                                collection: "Birthday Fund",
-                                amount: "₦15,000",
-                                date: "Feb 13, 2026",
-                            },
-                        ].map((payment, index) => (
-                            <div
-                                key={index}
-                                className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50 transition"
-                            >
-                                <div>
-                                    <p className="font-medium text-gray-900">
-                                        {payment.name}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        {payment.collection}
-                                    </p>
+                            { name: "Final Year Project Dues", status: "active", collected: "₦300,000", target: "₦500,000", progress: 60, contributors: 32, deadline: "Mar 20" },
+                            { name: "Class Dues — 400L", status: "active", collected: "₦85,000", target: "₦150,000", progress: 57, contributors: 17, deadline: "Apr 1" },
+                            { name: "Birthday Gift for Tola", status: "active", collected: "₦42,000", target: "₦50,000", progress: 84, contributors: 14, deadline: "Feb 28" },
+                            { name: "Office Lunch Fund", status: "active", collected: "₦18,500", target: "₦30,000", progress: 62, contributors: 7, deadline: "Mar 5" },
+                        ].map((col, i) => (
+                            <div key={i}>
+                                {/* Desktop table row */}
+                                <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group"
+                                    onClick={() => navigate(`/collections/${i + 1}`)}>
+                                    <div className="col-span-4">
+                                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                        <p className="text-sm font-semibold text-gray-900">{col.collected}</p>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                        <p className="text-sm text-gray-500">{col.target}</p>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div className={`h-full rounded-full transition-all ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
+                                            </div>
+                                            <span className="text-[11px] font-medium text-gray-500 w-8 text-right">{col.progress}%</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 flex items-center justify-end gap-1">
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link">
+                                            <Copy size={14} />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share">
+                                            <ExternalLink size={14} />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
+                                            <MoreHorizontal size={14} />
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div className="text-left sm:text-right">
-                                    <p className="font-semibold text-gray-900">
-                                        {payment.amount}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {payment.date}
-                                    </p>
+                                {/* Mobile card row */}
+                                <div className="md:hidden flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 active:bg-gray-50 transition-colors cursor-pointer"
+                                    onClick={() => navigate(`/collections/${i + 1}`)}>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{col.name}</p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div className={`h-full rounded-full ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
+                                            </div>
+                                            <span className="text-[10px] font-medium text-gray-500 w-7 text-right">{col.progress}%</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className="text-sm font-bold text-gray-900">{col.collected}</p>
+                                        <p className="text-[10px] text-gray-400">of {col.target}</p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* Right Column — Recent Payments + Quick Stats (1/3 width on desktop) */}
+                    <div className="space-y-6">
+
+                        {/* Revenue Summary */}
+                        <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-semibold text-gray-900">Revenue Trend</h3>
+                                <BarChart3 size={16} className="text-gray-400" />
+                            </div>
+                            {/* Mini Chart Bars */}
+                            <div className="flex items-end gap-1.5 h-24 mb-3">
+                                {[35, 55, 40, 70, 60, 85, 75, 90, 65, 80, 95, 72].map((h, i) => (
+                                    <div key={i} className="flex-1 rounded-t-sm bg-blue-100 hover:bg-blue-500 transition-colors cursor-pointer" style={{ height: `${h}%` }} />
+                                ))}
+                            </div>
+                            <div className="flex justify-between text-[10px] text-gray-400">
+                                <span>Jan</span>
+                                <span>Feb</span>
+                                <span>Mar</span>
+                                <span>Apr</span>
+                                <span>May</span>
+                                <span>Jun</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                                <div>
+                                    <p className="text-xs text-gray-500">This Month</p>
+                                    <p className="text-lg font-bold text-gray-900 mt-0.5">₦320,000</p>
+                                </div>
+                                <div className="flex items-center gap-1 text-green-600 text-xs font-semibold bg-green-50 px-2.5 py-1 rounded-full">
+                                    <TrendingUp size={12} />
+                                    +18.2%
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Payments */}
+                        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                                <h3 className="text-sm font-semibold text-gray-900">Recent Payments</h3>
+                                <Link to="/contributors" className="text-xs text-blue-600 font-medium hover:underline">All</Link>
+                            </div>
+                            <div className="divide-y divide-gray-50">
+                                {[
+                                    { name: "David Musa", collection: "Project Dues", amount: "₦20,000", time: "2h ago" },
+                                    { name: "Grace John", collection: "Birthday Fund", amount: "₦15,000", time: "5h ago" },
+                                    { name: "Tola Adeniyi", collection: "Class Dues", amount: "₦5,000", time: "1d ago" },
+                                    { name: "Ayo Badmus", collection: "Project Dues", amount: "₦20,000", time: "1d ago" },
+                                    { name: "Chioma Okeke", collection: "Office Lunch", amount: "₦3,000", time: "2d ago" },
+                                ].map((p, i) => (
+                                    <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50/50 transition-colors">
+                                        <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-600 shrink-0">
+                                            {p.name.split(" ").map(n => n[0]).join("")}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
+                                            <p className="text-[10px] text-gray-400 truncate">{p.collection} · {p.time}</p>
+                                        </div>
+                                        <p className="text-xs font-bold text-gray-900 shrink-0">{p.amount}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Export / Reporting */}
+                        <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Reports</h3>
+                            <div className="space-y-2">
+                                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition text-left group">
+                                    <div className="p-2 rounded-lg bg-blue-50">
+                                        <Download size={14} className="text-blue-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs font-semibold text-gray-900">Export Data</p>
+                                        <p className="text-[10px] text-gray-400">Download CSV/PDF reports</p>
+                                    </div>
+                                    <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition" />
+                                </button>
+                                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition text-left group">
+                                    <div className="p-2 rounded-lg bg-purple-50">
+                                        <BarChart3 size={14} className="text-purple-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs font-semibold text-gray-900">Analytics</p>
+                                        <p className="text-[10px] text-gray-400">View detailed insights</p>
+                                    </div>
+                                    <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition" />
+                                </button>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
-
             </div>
         </AppLayout>
     );
 }
+

@@ -2,7 +2,6 @@ import { Search, Users as UsersIcon } from "lucide-react";
 import { useState } from "react";
 import AppLayout from "~/components/layouts/app-layout";
 import { Badge } from "~/components/ui/badge";
-import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 
 const contributors = [
@@ -25,12 +24,12 @@ export default function Contributors() {
   );
 
   return (
-    <AppLayout>
-      <div className="space-y-6 animate-fade-in">
+    <AppLayout className="bg-[#f4f5f6]">
+      <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Contributors</h1>
-            <p className="text-sm text-muted-foreground">Everyone who has contributed to your collections.</p>
+            <h1 className="text-2xl font-bold text-gray-900">Contributors</h1>
+            <p className="text-sm text-gray-500">Everyone who has contributed to your collections.</p>
           </div>
           <Badge variant="secondary" className="self-start text-xs">
             {contributors.length} total
@@ -44,31 +43,29 @@ export default function Contributors() {
 
         <div className="space-y-2">
           {filtered.map((c, i) => (
-            <Card key={i} className="shadow-card border-border hover:shadow-card-hover transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
-                    {c.name.split(" ").map((n) => n[0]).join("")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-foreground">{c.totalPaid}</p>
-                    <p className="text-[10px] text-muted-foreground">{c.collections} collections</p>
-                  </div>
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-600 shrink-0">
+                  {c.name.split(" ").map((n) => n[0]).join("")}
                 </div>
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
-                  <span className="text-[10px] text-muted-foreground">Last payment: {c.lastPayment}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{c.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{c.email}</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-gray-900">{c.totalPaid}</p>
+                  <p className="text-[10px] text-gray-500">{c.collections} collections</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                <span className="text-[10px] text-gray-400">Last payment: {c.lastPayment}</span>
+              </div>
+            </div>
           ))}
           {filtered.length === 0 && (
             <div className="text-center py-12">
-              <UsersIcon className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No contributors found</p>
+              <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No contributors found</p>
             </div>
           )}
         </div>

@@ -2,8 +2,6 @@ import { Link } from "react-router";
 import { Plus, Search, FolderOpen } from "lucide-react";
 import { useState } from "react";
 import { Input } from "~/components/ui/input";
-import { Card, CardContent } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import AppLayout from "~/components/layouts/app-layout";
 
 const collections = [
@@ -25,13 +23,13 @@ export default function Collections() {
   });
 
   return (
-    <AppLayout>
-      <div className="space-y-6 animate-fade-in">
+    <AppLayout className="bg-[#f4f5f6]">
+      <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-2xl font-bold text-foreground">Collections</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Collections</h1>
           <Link
             to="/collections/new"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
             <Plus className="h-4 w-4" />
             New Collection
@@ -54,9 +52,9 @@ export default function Collections() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium capitalize transition-colors ${filter === f
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-accent"
+                className={`px-3 py-2 rounded-full text-xs font-medium capitalize transition-colors ${filter === f
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
                   }`}
               >
                 {f}
@@ -69,51 +67,46 @@ export default function Collections() {
         <div className="space-y-3">
           {filtered.map((col) => (
             <Link key={col.id} to={`/collections/${col.id}`}>
-              <Card className="shadow-card border-border hover:shadow-card-hover transition-shadow cursor-pointer mb-3">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-foreground truncate">{col.name}</p>
-                        <Badge
-                          variant={col.status === "active" ? "default" : "secondary"}
-                          className={`text-[10px] ${col.status === "active" ? "bg-success text-success-foreground" : ""}`}
-                        >
-                          {col.status}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{col.description}</p>
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-colors cursor-pointer mb-3">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{col.name}</p>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${col.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                        {col.status}
+                      </span>
                     </div>
+                    <p className="text-xs text-gray-500">{col.description}</p>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-                    <span>{col.contributors} contributors</span>
-                    <span className="font-semibold text-foreground">{col.collected} / {col.target}</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden mt-2">
-                    <div
-                      className="h-full gradient-primary rounded-full"
-                      style={{
-                        width: `${Math.min(
-                          (parseInt(col.collected.replace(/[₦,]/g, "")) /
-                            parseInt(col.target.replace(/[₦,]/g, ""))) *
-                          100,
-                          100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-500 mt-3">
+                  <span>{col.contributors} contributors</span>
+                  <span className="font-semibold text-gray-900">{col.collected} / {col.target}</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
+                  <div
+                    className="h-full bg-blue-600 rounded-full"
+                    style={{
+                      width: `${Math.min(
+                        (parseInt(col.collected.replace(/[₦,]/g, "")) /
+                          parseInt(col.target.replace(/[₦,]/g, ""))) *
+                        100,
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
             </Link>
           ))}
           {filtered.length === 0 && (
             <div className="text-center py-12">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No collections found</p>
+              <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No collections found</p>
             </div>
           )}
         </div>
-      </div>
-    </AppLayout>
+      </div >
+    </AppLayout >
   );
 }

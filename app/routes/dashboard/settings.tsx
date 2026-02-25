@@ -1,98 +1,113 @@
 import { useState } from "react";
-import { Save, Download, LogOut, Bell, LucideLogOut } from "lucide-react";
+import { Download, LucideLogOut, Building2, User, Shield, Bell } from "lucide-react";
 import { useNavigate } from "react-router";
-import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import AppLayout from "~/components/layouts/app-layout";
 import { Separator } from "~/components/ui/separator";
-import { useToast } from "~/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Switch } from "~/components/ui/switch";
 
 const Settings = () => {
   const [notifications, setNotifications] = useState(true);
   const [emailReceipts, setEmailReceipts] = useState(true);
-
-  const [bankName, setBankName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [saving, setSaving] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
-
-  const handleSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      toast({ title: "Settings saved", description: "Your profile has been updated." });
-    }, 600);
-  };
 
   return (
     <AppLayout className="bg-[#f4f5f6]">
       <h1 className="mb-1 text-2xl font-bold text-foreground">Settings</h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        Configure notifications, payment alerts, data exports, and account security
+        Manage your account, business, and security preferences
       </p>
 
-      <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
-        {/* Profile */}
-        <section>
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Notifications
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Payment Alerts</p>
-                <p className="text-xs text-muted-foreground">Get notified for new payments</p>
-              </div>
-              <Switch checked={notifications} onCheckedChange={setNotifications} />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Email Receipts</p>
-                <p className="text-xs text-muted-foreground">Send receipts to contributors</p>
-              </div>
-              <Switch checked={emailReceipts} onCheckedChange={setEmailReceipts} />
-            </div>
+      {/* ─── MY PROFILE (PERSON) ─── */}
+      <div className="bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">My Profile</h2>
+        <p className="text-xs text-muted-foreground mb-4">Your personal account details</p>
+
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-3 h-14 text-left"
+          onClick={() => navigate("/settings/profile")}
+        >
+          <div className="bg-blue-50 p-2 rounded-lg">
+            <User size={18} className="text-blue-600" />
           </div>
-        </section>
+          <div className="flex flex-col items-start leading-none gap-1">
+            <span className="font-medium text-gray-900">Personal Information</span>
+            <span className="text-xs text-gray-500 font-normal">Name, email, phone, and avatar</span>
+          </div>
+        </Button>
       </div>
 
-      <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
-        {/* Payout */}
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Data & Export
-          </h2>
-          
-        {/* Export & Logout */}
-        <section className="space-y-3">
-          <Button variant="outline" className="w-full gap-2">
-            <Download size={16} /> Export Payment History
-          </Button>
-          {/* <Button
+      {/* ─── MY BUSINESS ─── */}
+      <div className="bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">My Business</h2>
+        <p className="text-xs text-muted-foreground mb-4">Your business profile and payout settings</p>
+
+        <div className="space-y-3">
+          <Button
             variant="outline"
-            className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={() => navigate("/")}
+            className="w-full justify-start gap-3 h-14 text-left"
+            onClick={() => navigate("/profile")}
           >
-            <LogOut size={16} /> Logout
-          </Button> */}
-        </section>
+            <div className="bg-purple-50 p-2 rounded-lg">
+              <Building2 size={18} className="text-purple-600" />
+            </div>
+            <div className="flex flex-col items-start leading-none gap-1">
+              <span className="font-medium text-gray-900">Business Profile & Payouts</span>
+              <span className="text-xs text-gray-500 font-normal">Business name, category, bank account & withdrawals</span>
+            </div>
+          </Button>
+        </div>
       </div>
 
-      <div className="space-y-8 bg-white p-5 lg:p-6 rounded-[12px]">
-        {/* Payout */}
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Security
-          </h2>
-          
-        {/* Export & Logout */}
-        <section className="space-y-3">
-          <Button variant="outline" className="w-full gap-2">
-            Change Password
+      {/* ─── NOTIFICATIONS ─── */}
+      <div className="bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">Notifications</h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Payment Alerts</p>
+              <p className="text-xs text-muted-foreground">Get notified for new payments</p>
+            </div>
+            <Switch checked={notifications} onCheckedChange={setNotifications} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Email Receipts</p>
+              <p className="text-xs text-muted-foreground">Send receipts to contributors</p>
+            </div>
+            <Switch checked={emailReceipts} onCheckedChange={setEmailReceipts} />
+          </div>
+        </div>
+      </div>
+
+      {/* ─── DATA & EXPORT ─── */}
+      <div className="bg-white p-5 lg:p-6 rounded-[12px] mb-[24px]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">Data & Export</h2>
+        <Button variant="outline" className="w-full gap-2">
+          <Download size={16} /> Export Payment History
+        </Button>
+      </div>
+
+      {/* ─── SECURITY ─── */}
+      <div className="bg-white p-5 lg:p-6 rounded-[12px]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">Security</h2>
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-3 h-14 text-left"
+            onClick={() => navigate("/settings/security")}
+          >
+            <div className="bg-orange-50 p-2 rounded-lg">
+              <Shield size={18} className="text-orange-600" />
+            </div>
+            <div className="flex flex-col items-start leading-none gap-1">
+              <span className="font-medium text-gray-900">Password & Security</span>
+              <span className="text-xs text-gray-500 font-normal">Change password, delete account</span>
+            </div>
           </Button>
+
           <Button
             variant="outline"
             className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
@@ -100,7 +115,7 @@ const Settings = () => {
           >
             <LucideLogOut size={16} /> Logout
           </Button>
-        </section>
+        </div>
       </div>
     </AppLayout>
   );

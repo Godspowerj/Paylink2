@@ -93,7 +93,7 @@ export default function Notifications() {
     };
 
     return (
-        <AppLayout className="bg-[#f9fafb]">
+        <AppLayout className="bg-[#f4f5f6]">
             <div className="max-w-3xl mx-auto pb-10">
 
                 {/* Header */}

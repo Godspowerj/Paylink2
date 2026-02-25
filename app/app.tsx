@@ -4,7 +4,7 @@ import Landing from './routes/landing';
 import Login from './routes/auth/login';
 import Register from './routes/auth/register';
 import Settings from './routes/dashboard/settings';
-import Collections from './routes/dashboard/collections';
+import PaymentLinks from './routes/dashboard/links';
 import Profile from './routes/dashboard/profile';
 import NotFound from './routes/not-found';
 import CollectionCreate from './routes/dashboard/collections-create';
@@ -12,6 +12,10 @@ import Testing from './routes/testing';
 import { AuthProvider } from './contexts/auth';
 import Dashboard from './routes/dashboard';
 import Notifications from './routes/dashboard/notifications';
+import LinkDetails from './routes/dashboard/link-details';
+import SettingsProfile from './routes/dashboard/settings-profile';
+import SettingsSecurity from './routes/dashboard/settings-security';
+
 
 
 const Root = () => {
@@ -50,8 +54,11 @@ const router = createBrowserRouter([
         children: [
           { path: '/dashboard', element: <Dashboard /> },
           { path: '/settings', element: <Settings /> },
-          { path: '/collections', element: <Collections /> },
+          { path: '/settings/profile', element: <SettingsProfile /> },
+          { path: '/settings/security', element: <SettingsSecurity /> },
+          { path: '/collections', element: <PaymentLinks /> },
           { path: '/collections/create', element: <CollectionCreate /> },
+          { path: '/collections/:id', element: <LinkDetails /> },
           { path: '/profile', element: <Profile /> },
           { path: '/notifications', element: <Notifications /> },
           { path: '/testing', element: <Testing /> },

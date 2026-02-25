@@ -313,7 +313,7 @@ function HeroBrand() {
             <GridPattern width={50} height={50} className="text-gray-200/60 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)]" />
          </div>
 
-         <div className="relative z-10 w-full max-w-[1200px] px-6 text-center mb-16">
+         <div className="relative z-10 w-full max-w-[1200px] px-6 text-center mb-16 overflow-hidden">
 
             {/* FLOATING REALISTIC TRANSACTIONS (Desktop Only) */}
             <FloatingCard x={x1} y={y1} rotate={-6} className="-top-24 left-0 md:top-0 md:left-[10%] scale-90 md:scale-100 origin-top-left">
@@ -324,11 +324,11 @@ function HeroBrand() {
                <TransactionPill icon={ArrowDownLeft} name="Trip Contribution" amount="+₦5,000" type="credit" />
             </FloatingCard>
 
-            <FloatingCard x={x2} y={y2} rotate={-3} delay={0.4} className="bottom-40 -left-6 md:bottom-[180px] md:left-[5%] scale-90 md:scale-100 origin-bottom-left z-10 md:z-20">
+            <FloatingCard x={x2} y={y2} rotate={-3} delay={0.4} className="bottom-40 left-0 md:bottom-[180px] md:left-[5%] scale-90 md:scale-100 origin-bottom-left z-10 md:z-20">
                <TransactionPill icon={Briefcase} name="Consulting Fee" amount="+₦85,000" type="credit" />
             </FloatingCard>
 
-            <FloatingCard x={x1} y={y1} rotate={4} delay={0.6} className="bottom-60 -right-6 md:bottom-[220px] md:right-[5%] scale-90 md:scale-100 origin-bottom-right z-10 md:z-20">
+            <FloatingCard x={x1} y={y1} rotate={4} delay={0.6} className="bottom-60 right-0 md:bottom-[220px] md:right-[5%] scale-90 md:scale-100 origin-bottom-right z-10 md:z-20">
                <TransactionPill icon={Store} name="Store Sale #402" amount="+₦12,500" type="credit" />
             </FloatingCard>
 

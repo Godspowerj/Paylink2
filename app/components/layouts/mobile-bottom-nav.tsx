@@ -7,7 +7,7 @@ export function MobileBottomNav() {
 
     const navItems = [
         { label: "Home", icon: LayoutDashboard, path: "/dashboard" },
-        { label: "Links", icon: Layers, path: "/dashboard/links" }, // Update these if routes change
+        { label: "Collections", icon: Layers, path: "/collections" },
         { label: "Add", icon: Plus, path: "/collections/create", isAction: true },
         { label: "Invoices", icon: FileText, path: "/dashboard/invoices" },
         { label: "Settings", icon: Settings, path: "/settings" },
