@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { X, LayoutDashboard, Layers, Users, Settings, CreditCard, Bell, BarChart3, HelpCircle, LogOut } from "lucide-react";
+import { X, LayoutDashboard, Layers, Users, Settings, CreditCard, Bell, BarChart3, FileText, HelpCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 import Logo from "../logo";
 import { ChevronDownIcon, DashboardIcon, Layers01Icon, LogoutIcon, MenuIcon, NotificationIcon, SettingsIcon, UserIcon } from "../svgs";
@@ -12,8 +12,9 @@ import { MobileBottomNav } from "./mobile-bottom-nav";
 const sidebarItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "Collections", icon: Layers, path: "/collections" },
+  { label: "Payments", icon: CreditCard, path: "/payments" },
   { label: "Contributors", icon: Users, path: "/contributors" },
-  { label: "Payments", icon: CreditCard, path: "/links" },
+  { label: "Invoices", icon: FileText, path: "/invoices" },
   { label: "Notifications", icon: Bell, path: "/notifications" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
@@ -163,6 +164,8 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
               {[
                 { label: "Dashboard", icon: <DashboardIcon />, link: "/dashboard" },
                 { label: "Collections", icon: <Layers01Icon />, link: "/collections" },
+                { label: "Payments", icon: <DashboardIcon />, link: "/payments" },
+                { label: "Contributors", icon: <UserIcon />, link: "/contributors" },
                 { label: "Business Profile", icon: <UserIcon />, link: "/profile" },
                 { label: "Settings", icon: <SettingsIcon />, link: "/settings" },
                 { label: "Logout", icon: <LogoutIcon />, link: "/logout" },
@@ -186,7 +189,7 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
         </div>
 
         {/* ═══ PAGE CONTENT ═══ */}
-        <div className="w-full max-w-full overflow-x-hidden px-5 lg:px-8 pt-6 pb-24 lg:pb-10">
+        <div className="w-full max-w-full overflow-x-hidden px-5 lg:px-8 pt-2 lg:pt-6 pb-24 lg:pb-10">
           {children}
         </div>
 

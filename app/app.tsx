@@ -15,6 +15,10 @@ import Notifications from './routes/dashboard/notifications';
 import LinkDetails from './routes/dashboard/link-details';
 import SettingsProfile from './routes/dashboard/settings-profile';
 import SettingsSecurity from './routes/dashboard/settings-security';
+import Invoices from './routes/dashboard/invoices';
+import Contributors from './routes/dashboard/contributors';
+import Payments from './routes/dashboard/payments';
+import CreateInvoice from './routes/dashboard/invoice-create';
 
 
 
@@ -61,6 +65,11 @@ const router = createBrowserRouter([
           { path: '/collections/:id', element: <LinkDetails /> },
           { path: '/profile', element: <Profile /> },
           { path: '/notifications', element: <Notifications /> },
+          { path: '/invoices', element: <Invoices /> },
+          { path: '/invoices/create', element: <CreateInvoice /> },
+          { path: '/dashboard/invoices', element: <Invoices /> },
+          { path: '/contributors', element: <Contributors /> },
+          { path: '/payments', element: <Payments /> },
           { path: '/testing', element: <Testing /> },
         ]
       },

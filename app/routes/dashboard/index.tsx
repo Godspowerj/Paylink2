@@ -5,32 +5,26 @@ import {
     CheckCircle2,
     TrendingUp,
     ArrowUpRight,
+    ArrowDownLeft,
     Link2,
     Share2,
-    Activity,
     BarChart3,
     Download,
     Filter,
     MoreHorizontal,
-    Clock,
-    ArrowRight,
     ChevronRight,
     ExternalLink,
     Search,
+    Send,
+    QrCode,
+    ArrowRight,
+    Sparkles,
 } from "lucide-react";
 import {
     Users,
-    Calendar,
     Copy,
-    Eye,
 } from "lucide-react";
 import AppLayout from "~/components/layouts/app-layout";
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/pagination';
 
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/auth";
@@ -47,7 +41,7 @@ export default function Dashboard() {
 
     return (
         <AppLayout>
-            <div className="space-y-6 lg:space-y-8 pt-4">
+            <div className="space-y-5 lg:space-y-8">
 
                 {/* Business Setup Warning */}
                 {hasNoBusiness && (
@@ -63,18 +57,128 @@ export default function Dashboard() {
                     </div>
                 )}
 
+                {/* ═══ MOBILE DASHBOARD ═══ */}
+                <div className="lg:hidden space-y-6">
+
+                    {/* Balance + Period Filter */}
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm text-gray-400">Total balance</p>
+                            <div className="flex bg-gray-100 rounded-full p-0.5">
+                                {(["7d", "30d", "90d"] as const).map(p => (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPeriod(p)}
+                                        className={`px-3 py-1 text-[11px] font-medium rounded-full transition-all ${period === p ? "bg-white text-gray-900 shadow-sm" : "text-gray-400"}`}
+                                    >
+                                        {p === "7d" ? "7d" : p === "30d" ? "30d" : "90d"}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <h2 className="text-[34px] font-bold text-gray-900 tracking-tight leading-none">
+                            ₦1,250,000
+                        </h2>
+                        <p className="text-sm font-semibold text-emerald-600 mt-2 flex items-center gap-1">
+                            <TrendingUp size={14} />
+                            ₦138,000 (12.4%)
+                        </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate("/collections/create")}
+                            className="flex-1 flex items-center justify-center gap-2 h-[48px] bg-white rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 active:bg-gray-50 transition-colors"
+                        >
+                            <Send size={16} className="text-gray-700" />
+                            Create
+                        </button>
+                        <button
+                            className="flex-1 flex items-center justify-center gap-2 h-[48px] bg-white rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 active:bg-gray-50 transition-colors"
+                        >
+                            <QrCode size={16} className="text-gray-700" />
+                            Share
+                        </button>
+                        <button className="h-[48px] w-[48px] shrink-0 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-600 active:bg-gray-50 transition-colors">
+                            <Download size={18} />
+                        </button>
+                    </div>
+
+                    {/* Brand Banner */}
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 px-5 py-5">
+                        {/* Decorative elements */}
+                        <div className="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
+                        <div className="absolute bottom-0 left-1/2 w-20 h-20 bg-white/10 rounded-full translate-y-6" />
+                        <div className="absolute top-4 right-16 w-3 h-3 bg-white/20 rounded-full" />
+
+                        <div className="relative z-10 flex items-start justify-between">
+                            <div>
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <Sparkles size={14} className="text-yellow-300" />
+                                    <span className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider">Pro Tip</span>
+                                </div>
+                                <p className="text-white font-semibold text-[15px] leading-snug">
+                                    Share your collection link<br />and get paid faster
+                                </p>
+                                <button className="mt-3 text-xs font-semibold text-white/80 flex items-center gap-1 hover:text-white transition-colors">
+                                    share invite <ChevronRight size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Activity */}
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-base font-semibold text-gray-900">Activity</h3>
+                            <Link to="/collections" className="text-sm text-gray-400 font-medium flex items-center gap-0.5">
+                                See all <ChevronRight size={16} />
+                            </Link>
+                        </div>
+
+                        <div className="space-y-1">
+                            {[
+                                { name: "David Musa", desc: "Project Dues", amount: "₦20,000", time: "2h ago", type: "credit" },
+                                { name: "Grace John", desc: "Birthday Fund", amount: "₦15,000", time: "5h ago", type: "credit" },
+                                { name: "Tola Adeniyi", desc: "Class Dues", amount: "₦5,000", time: "1d ago", type: "credit" },
+                            ].map((tx, i) => (
+                                <div key={i} className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0">
+                                    <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                        {tx.type === "credit" ? (
+                                            <ArrowDownLeft size={18} className="text-gray-600" />
+                                        ) : (
+                                            <ArrowUpRight size={18} className="text-gray-600" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900">{tx.name}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">{tx.time}</p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className={`text-sm font-bold ${tx.type === "credit" ? "text-emerald-600" : "text-gray-900"}`}>
+                                            {tx.amount}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ═══ DESKTOP DASHBOARD ═══ */}
+
                 {/* Header Row */}
-                <div className="flex items-center justify-between">
-                    {/* Greeting — hidden on mobile since the app header already shows it */}
-                    <div className="hidden sm:block">
-                        <h1 className="text-xl lg:text-2xl font-bold text-gray-900 tracking-tight">
+                <div className="hidden lg:flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                             {getGreeting()}, {user.firstName}
                         </h1>
                         <p className="text-sm text-gray-500 mt-1">
                             Here's an overview of your collections and payments
                         </p>
                     </div>
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <div className="flex items-center gap-3">
                         <div className="flex bg-gray-100 rounded-full p-1">
                             {(["7d", "30d", "90d"] as const).map(p => (
                                 <button
@@ -91,64 +195,56 @@ export default function Dashboard() {
                             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors"
                         >
                             <Plus size={16} strokeWidth={2.5} />
-                            <span className="hidden sm:inline">Create Collection</span>
-                            <span className="sm:hidden">Create</span>
+                            Create Collection
                         </button>
                     </div>
                 </div>
 
                 {/* KPI Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+                <div className="hidden lg:grid grid-cols-4 gap-5">
                     {[
-                        { label: "Total Collected", value: "₦1,250,000", change: "+12.4%", changeUp: true, icon: Wallet, iconBg: "bg-blue-50", iconColor: "text-blue-600", sub: "from 186 contributors" },
-                        { label: "Active Collections", value: "4", change: "2 near goal", changeUp: true, icon: Layers, iconBg: "bg-purple-50", iconColor: "text-purple-600", sub: "₦485,000 pending" },
-                        { label: "Completed", value: "12", change: "100% success", changeUp: true, icon: CheckCircle2, iconBg: "bg-green-50", iconColor: "text-green-600", sub: "₦2.4M total collected" },
-                        { label: "Contributors", value: "186", change: "+24 this month", changeUp: true, icon: Users, iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "89% completion rate" },
+                        { label: "Total Collected", value: "₦1,250,000", change: "+12.4%", icon: Wallet, iconBg: "bg-blue-50", iconColor: "text-blue-600", sub: "from 186 contributors" },
+                        { label: "Active Collections", value: "4", change: "2 near goal", icon: Layers, iconBg: "bg-purple-50", iconColor: "text-purple-600", sub: "₦485,000 pending" },
+                        { label: "Completed", value: "12", change: "100% success", icon: CheckCircle2, iconBg: "bg-green-50", iconColor: "text-green-600", sub: "₦2.4M total collected" },
+                        { label: "Contributors", value: "186", change: "+24 this month", icon: Users, iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "89% completion rate" },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 lg:p-5 hover:border-gray-200 transition-colors group">
+                        <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-gray-200 transition-colors">
                             <div className="flex items-center justify-between">
-                                <div className={`p-2 lg:p-2.5 rounded-xl ${stat.iconBg}`}>
+                                <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
                                     <stat.icon className={stat.iconColor} size={18} />
                                 </div>
-                                <div className="flex items-center gap-1 text-[10px] lg:text-xs font-medium text-green-600">
+                                <div className="flex items-center gap-1 text-xs font-medium text-green-600">
                                     <TrendingUp size={12} />
                                     {stat.change}
                                 </div>
                             </div>
-                            <div className="mt-3 lg:mt-4">
-                                <p className="text-xs lg:text-sm text-gray-500">{stat.label}</p>
-                                <h3 className="text-lg lg:text-2xl font-bold text-gray-900 mt-1 tracking-tight">{stat.value}</h3>
-                                <p className="text-[10px] lg:text-[11px] text-gray-400 mt-1 hidden sm:block">{stat.sub}</p>
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-500">{stat.label}</p>
+                                <h3 className="text-2xl font-bold text-gray-900 mt-1 tracking-tight">{stat.value}</h3>
+                                <p className="text-[11px] text-gray-400 mt-1">{stat.sub}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Two-Column Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="hidden lg:grid grid-cols-3 gap-6">
 
-                    {/* Left Column — Active Collections (2/3 width on desktop) */}
-                    <div className="hidden lg:block lg:col-span-2 bg-white border border-gray-100 rounded-2xl overflow-hidden">
-                        <div className="flex items-center justify-between p-4 lg:p-5 border-b border-gray-100">
+                    {/* Active Collections Table */}
+                    <div className="col-span-2 bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                        <div className="flex items-center justify-between p-5 border-b border-gray-100">
                             <div>
-                                <h2 className="text-sm lg:text-base font-semibold text-gray-900">Active Collections</h2>
-                                <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Monitor and manage active collections</p>
+                                <h2 className="text-base font-semibold text-gray-900">Active Collections</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Monitor and manage active collections</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition hidden sm:block">
-                                    <Search size={16} />
-                                </button>
-                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition hidden sm:block">
-                                    <Filter size={16} />
-                                </button>
-                                <Link to="/collections" className="text-xs text-blue-600 font-medium hover:underline ml-2">
-                                    View All →
-                                </Link>
+                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition"><Search size={16} /></button>
+                                <button className="p-2 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition"><Filter size={16} /></button>
+                                <Link to="/collections" className="text-xs text-blue-600 font-medium hover:underline ml-2">View All →</Link>
                             </div>
                         </div>
 
-                        {/* Table Header — hidden on mobile */}
-                        <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50/80 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                        <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50/80 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">
                             <div className="col-span-4">Collection</div>
                             <div className="col-span-2 text-right">Collected</div>
                             <div className="col-span-2 text-right">Target</div>
@@ -156,92 +252,55 @@ export default function Dashboard() {
                             <div className="col-span-2 text-right">Actions</div>
                         </div>
 
-                        {/* Collection Rows */}
                         {[
-                            { name: "Final Year Project Dues", status: "active", collected: "₦300,000", target: "₦500,000", progress: 60, contributors: 32, deadline: "Mar 20" },
-                            { name: "Class Dues — 400L", status: "active", collected: "₦85,000", target: "₦150,000", progress: 57, contributors: 17, deadline: "Apr 1" },
-                            { name: "Birthday Gift for Tola", status: "active", collected: "₦42,000", target: "₦50,000", progress: 84, contributors: 14, deadline: "Feb 28" },
-                            { name: "Office Lunch Fund", status: "active", collected: "₦18,500", target: "₦30,000", progress: 62, contributors: 7, deadline: "Mar 5" },
+                            { name: "Final Year Project Dues", collected: "₦300,000", target: "₦500,000", progress: 60, contributors: 32, deadline: "Mar 20" },
+                            { name: "Class Dues — 400L", collected: "₦85,000", target: "₦150,000", progress: 57, contributors: 17, deadline: "Apr 1" },
+                            { name: "Birthday Gift for Tola", collected: "₦42,000", target: "₦50,000", progress: 84, contributors: 14, deadline: "Feb 28" },
+                            { name: "Office Lunch Fund", collected: "₦18,500", target: "₦30,000", progress: 62, contributors: 7, deadline: "Mar 5" },
                         ].map((col, i) => (
-                            <div key={i}>
-                                {/* Desktop table row */}
-                                <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group"
-                                    onClick={() => navigate(`/collections/${i + 1}`)}>
-                                    <div className="col-span-4">
-                                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
-                                        <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
-                                    </div>
-                                    <div className="col-span-2 text-right">
-                                        <p className="text-sm font-semibold text-gray-900">{col.collected}</p>
-                                    </div>
-                                    <div className="col-span-2 text-right">
-                                        <p className="text-sm text-gray-500">{col.target}</p>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                                <div className={`h-full rounded-full transition-all ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
-                                            </div>
-                                            <span className="text-[11px] font-medium text-gray-500 w-8 text-right">{col.progress}%</span>
+                            <div key={i}
+                                className="grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group"
+                                onClick={() => navigate(`/collections/${i + 1}`)}
+                            >
+                                <div className="col-span-4">
+                                    <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
+                                    <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
+                                </div>
+                                <div className="col-span-2 text-right"><p className="text-sm font-semibold text-gray-900">{col.collected}</p></div>
+                                <div className="col-span-2 text-right"><p className="text-sm text-gray-500">{col.target}</p></div>
+                                <div className="col-span-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div className={`h-full rounded-full ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
                                         </div>
-                                    </div>
-                                    <div className="col-span-2 flex items-center justify-end gap-1">
-                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link">
-                                            <Copy size={14} />
-                                        </button>
-                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share">
-                                            <ExternalLink size={14} />
-                                        </button>
-                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
-                                            <MoreHorizontal size={14} />
-                                        </button>
+                                        <span className="text-[11px] font-medium text-gray-500 w-8 text-right">{col.progress}%</span>
                                     </div>
                                 </div>
-
-                                {/* Mobile card row */}
-                                <div className="md:hidden flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 active:bg-gray-50 transition-colors cursor-pointer"
-                                    onClick={() => navigate(`/collections/${i + 1}`)}>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-gray-900 truncate">{col.name}</p>
-                                        <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
-                                        <div className="flex items-center gap-2 mt-2">
-                                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                                <div className={`h-full rounded-full ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
-                                            </div>
-                                            <span className="text-[10px] font-medium text-gray-500 w-7 text-right">{col.progress}%</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-right shrink-0">
-                                        <p className="text-sm font-bold text-gray-900">{col.collected}</p>
-                                        <p className="text-[10px] text-gray-400">of {col.target}</p>
-                                    </div>
+                                <div className="col-span-2 flex items-center justify-end gap-1">
+                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link"><Copy size={14} /></button>
+                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share"><ExternalLink size={14} /></button>
+                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"><MoreHorizontal size={14} /></button>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Right Column — Recent Payments + Quick Stats (1/3 width on desktop) */}
+                    {/* Right Column */}
                     <div className="space-y-6">
 
-                        {/* Revenue Summary */}
+                        {/* Revenue */}
                         <div className="bg-white border border-gray-100 rounded-2xl p-5">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-sm font-semibold text-gray-900">Revenue Trend</h3>
                                 <BarChart3 size={16} className="text-gray-400" />
                             </div>
-                            {/* Mini Chart Bars */}
                             <div className="flex items-end gap-1.5 h-24 mb-3">
                                 {[35, 55, 40, 70, 60, 85, 75, 90, 65, 80, 95, 72].map((h, i) => (
                                     <div key={i} className="flex-1 rounded-t-sm bg-blue-100 hover:bg-blue-500 transition-colors cursor-pointer" style={{ height: `${h}%` }} />
                                 ))}
                             </div>
                             <div className="flex justify-between text-[10px] text-gray-400">
-                                <span>Jan</span>
-                                <span>Feb</span>
-                                <span>Mar</span>
-                                <span>Apr</span>
-                                <span>May</span>
-                                <span>Jun</span>
+                                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
                             </div>
                             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                                 <div>
@@ -249,8 +308,7 @@ export default function Dashboard() {
                                     <p className="text-lg font-bold text-gray-900 mt-0.5">₦320,000</p>
                                 </div>
                                 <div className="flex items-center gap-1 text-green-600 text-xs font-semibold bg-green-50 px-2.5 py-1 rounded-full">
-                                    <TrendingUp size={12} />
-                                    +18.2%
+                                    <TrendingUp size={12} /> +18.2%
                                 </div>
                             </div>
                         </div>
@@ -283,14 +341,12 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Export / Reporting */}
+                        {/* Reports */}
                         <div className="bg-white border border-gray-100 rounded-2xl p-5">
                             <h3 className="text-sm font-semibold text-gray-900 mb-3">Reports</h3>
                             <div className="space-y-2">
                                 <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition text-left group">
-                                    <div className="p-2 rounded-lg bg-blue-50">
-                                        <Download size={14} className="text-blue-600" />
-                                    </div>
+                                    <div className="p-2 rounded-lg bg-blue-50"><Download size={14} className="text-blue-600" /></div>
                                     <div className="flex-1">
                                         <p className="text-xs font-semibold text-gray-900">Export Data</p>
                                         <p className="text-[10px] text-gray-400">Download CSV/PDF reports</p>
@@ -298,9 +354,7 @@ export default function Dashboard() {
                                     <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition" />
                                 </button>
                                 <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition text-left group">
-                                    <div className="p-2 rounded-lg bg-purple-50">
-                                        <BarChart3 size={14} className="text-purple-600" />
-                                    </div>
+                                    <div className="p-2 rounded-lg bg-purple-50"><BarChart3 size={14} className="text-purple-600" /></div>
                                     <div className="flex-1">
                                         <p className="text-xs font-semibold text-gray-900">Analytics</p>
                                         <p className="text-[10px] text-gray-400">View detailed insights</p>
@@ -309,11 +363,9 @@ export default function Dashboard() {
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </AppLayout>
     );
 }
-

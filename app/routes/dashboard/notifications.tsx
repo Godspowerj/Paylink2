@@ -93,8 +93,8 @@ export default function Notifications() {
     };
 
     return (
-        <AppLayout className="bg-[#f4f5f6]">
-            <div className="max-w-3xl mx-auto pb-10">
+        <AppLayout>
+            <div className="max-w-4xl lg:max-w-none pb-10">
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
