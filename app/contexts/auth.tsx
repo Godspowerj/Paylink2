@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useState, useEffect } from "react";
-import { Nav } from "react-day-picker";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import type { User } from "~/@types";
 import AuthenticatedPageShimmer from "~/components/shimmers/authenticated-page-shimmer";
