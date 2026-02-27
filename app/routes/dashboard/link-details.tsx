@@ -3,7 +3,7 @@ import { ArrowLeft, Share2, MoreHorizontal, QrCode, Copy, Check, Wallet, Calenda
 import { useNavigate, useParams } from "react-router";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
-import { toast } from "sonner";
+import { pToast } from "~/lib/toast";
 import { Skeleton } from "~/components/ui/skeleton";
 
 export default function LinkDetails() {
@@ -44,7 +44,7 @@ export default function LinkDetails() {
     const copyLink = () => {
         navigator.clipboard.writeText(link.fullUrl);
         setCopied(true);
-        toast.success("Link copied!");
+        pToast.success("Link copied!", "Payment link is in your clipboard");
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -324,56 +324,118 @@ export default function LinkDetails() {
                 {/* ═══ MOBILE VIEW ═══ */}
                 <div className="lg:hidden space-y-5 pb-32">
 
-                    {/* Description */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Calendar size={14} /> Due {link.deadline}
+                    {/* About & Share Link */}
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-4">
+                        <div>
+                            <p className="text-sm text-gray-700 leading-relaxed font-medium">{link.description}</p>
+                        </div>
+                        <div className="pt-4 border-t border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">Payment Link</h3>
+                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <p className="text-xs text-blue-600 flex-1 truncate font-mono font-medium">{link.url}</p>
+                                <button onClick={copyLink} className="p-1.5 rounded-lg bg-white shadow-sm border border-gray-200 text-gray-600 transition shrink-0 active:scale-95">
+                                    {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Stats */}
+                    {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white border border-gray-100 rounded-2xl p-4">
-                            <div className="p-2 w-fit rounded-lg bg-blue-50 text-blue-600 mb-3"><Wallet size={18} /></div>
-                            <p className="text-xs text-gray-500">Raised</p>
-                            <p className="text-xl font-bold text-gray-900 mt-0.5">{link.amount_raised}</p>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <div className="p-2 w-fit rounded-lg bg-blue-50 text-blue-600 mb-3"><Wallet size={16} /></div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Raised</p>
+                            <p className="text-xl font-bold text-gray-900 mt-1">{link.amount_raised}</p>
                         </div>
-                        <div className="bg-white border border-gray-100 rounded-2xl p-4">
-                            <div className="p-2 w-fit rounded-lg bg-gray-100 text-gray-600 mb-3"><TrendingUp size={18} /></div>
-                            <p className="text-xs text-gray-500">Goal</p>
-                            <p className="text-xl font-bold text-gray-900 mt-0.5">{link.goal}</p>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <div className="p-2 w-fit rounded-lg bg-purple-50 text-purple-600 mb-3"><Target size={16} /></div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Goal</p>
+                            <p className="text-xl font-bold text-gray-900 mt-1">{link.goal}</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <div className="p-2 w-fit rounded-lg bg-indigo-50 text-indigo-600 mb-3"><Users size={16} /></div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Contributors</p>
+                            <p className="text-xl font-bold text-gray-900 mt-1">{link.contributors.length}/{link.totalExpected}</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <div className="p-2 w-fit rounded-lg bg-emerald-50 text-emerald-600 mb-3"><TrendingUp size={16} /></div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Per Person</p>
+                            <p className="text-xl font-bold text-gray-900 mt-1">{link.perPerson}</p>
                         </div>
                     </div>
 
                     {/* Progress */}
-                    <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
                         <div className="flex justify-between items-end mb-3">
-                            <span className="text-sm font-semibold text-gray-900">Progress</span>
-                            <span className="text-sm font-medium text-blue-600">{link.progress}%</span>
+                            <span className="text-sm font-bold text-gray-900">Progress</span>
+                            <span className="text-sm font-bold text-blue-600">{link.progress}%</span>
                         </div>
-                        <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                             <div className="h-full bg-blue-600 rounded-full" style={{ width: `${link.progress}%` }} />
                         </div>
-                        <p className="text-xs text-gray-500 mt-2 text-right">₦150,000 remaining</p>
+                        <div className="flex items-center justify-between mt-3 text-xs">
+                            <span className="text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded-md border border-gray-100">₦150,000 remaining</span>
+                            <span className="flex items-center gap-1.5 text-gray-500 font-medium">
+                                <Calendar size={12} className="text-gray-400" /> Due {link.deadline}
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Contributors */}
-                    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-                        <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-                            <h3 className="text-base font-semibold text-gray-900">Recent Payments</h3>
-                            <button className="text-sm font-medium text-blue-600">View All</button>
+                    {/* Collected Data (Mobile) */}
+                    {link.customFields && link.customFields.length > 0 && (
+                        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                    <ClipboardList className="h-4 w-4 text-purple-600" />
+                                    Responses
+                                </h3>
+                                <button className="p-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-600 shadow-sm"><Download size={14} /></button>
+                            </div>
+
+                            <div className="space-y-3">
+                                {link.contributors.slice(0, 3).map((c, i) => (
+                                    <div key={i} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                                        <p className="text-xs font-bold text-gray-900 mb-2">{c.name}</p>
+                                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                                            {link.customFields.map((field, fi) => (
+                                                <div key={fi}>
+                                                    <span className="text-gray-400 block mb-0.5">{field}</span>
+                                                    <span className="font-medium text-gray-800">{(c as any).customData?.[field] || "—"}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="w-full mt-3 py-2 text-xs font-semibold text-blue-600 bg-blue-50/50 rounded-lg">View All Responses</button>
+                        </div>
+                    )}
+
+                    {/* Contributors List */}
+                    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <Users className="h-4 w-4 text-blue-600" />
+                                Recent Payments
+                            </h3>
+                            <button className="text-xs font-bold text-blue-600">View All</button>
                         </div>
                         <div className="divide-y divide-gray-50">
                             {link.contributors.map((c, i) => (
-                                <div key={i} className="p-4 flex items-center justify-between">
+                                <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                                     <div className="flex items-center gap-3">
-                                        <div className={cn("w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs", c.bg)}>
+                                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs ring-4 ring-white shadow-sm", c.bg)}>
                                             {c.avatar}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">{c.name}</p>
-                                            <p className="text-xs text-gray-500 mt-0.5">{c.time}</p>
+                                            <p className="text-sm font-bold text-gray-900">{c.name}</p>
+                                            <p className="text-[11px] font-medium text-gray-400 mt-0.5">{c.time} • {c.email}</p>
                                         </div>
                                     </div>
-                                    <span className="font-bold text-gray-900 text-sm">+{c.amount}</span>
+                                    <div className="text-right">
+                                        <span className="font-bold text-emerald-600 text-sm block">+{c.amount}</span>
+                                        <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded uppercase mt-0.5 inline-block border border-emerald-100">Paid</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>

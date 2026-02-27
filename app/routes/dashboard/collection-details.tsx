@@ -18,7 +18,7 @@ import {
   Wallet,
   Target,
 } from "lucide-react";
-import { toast } from "sonner";
+import { pToast } from "~/lib/toast";
 import { Button } from "~/components/ui/button";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
@@ -55,7 +55,7 @@ export default function CollectionDetails() {
 
   const copyLink = () => {
     navigator.clipboard.writeText(collectionData.link);
-    toast.success("Link copied to clipboard!");
+    pToast.success("Link copied!", "Payment link is in your clipboard");
   };
 
   const shareWhatsApp = () => {

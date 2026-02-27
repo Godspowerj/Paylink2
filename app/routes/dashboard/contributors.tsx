@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
 import { PageSkeleton } from "~/components/ui/skeleton";
-import { toast } from "sonner";
+import { pToast } from "~/lib/toast";
+import { motion } from "framer-motion";
 
 const contributors = [
   { name: "Adebayo James", email: "adebayo@email.com", totalPaid: "₦25,000", collections: 5, lastPayment: "Dec 20, 2025", avatar: "AJ", bg: "bg-blue-600 text-white" },
@@ -38,7 +39,12 @@ export default function Contributors() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <motion.div
+        className="space-y-6"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      >
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -47,7 +53,7 @@ export default function Contributors() {
             <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">Everyone who has contributed to your collections</p>
           </div>
           <div className="hidden lg:flex items-center gap-2">
-            <button onClick={() => toast.success("Exporting contributors...")} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+            <button onClick={() => pToast.info("Export started", "Your customer list is being prepared")} className="flex items-center gap-2 px-5 py-3 rounded-[16px] text-sm font-bold bg-white border-2 border-gray-100 text-gray-700 hover:border-gray-200 transition-all shadow-sm">
               <Download size={14} /> Export CSV
             </button>
           </div>
@@ -168,7 +174,7 @@ export default function Contributors() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </AppLayout>
   );
 }

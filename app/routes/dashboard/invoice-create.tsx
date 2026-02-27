@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, Trash2, Calendar, Check, ChevronDown, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Check, ChevronDown, Eye, QrCode, Link2 } from "lucide-react";
 import { useNavigate } from "react-router";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useAuth } from "~/contexts/auth";
+import { DatePicker } from "~/components/ui/date-picker";
+import { format } from "date-fns";
+import { motion } from "framer-motion";
 
 export default function CreateInvoice() {
     const navigate = useNavigate();
@@ -13,11 +16,14 @@ export default function CreateInvoice() {
 
     const [client, setClient] = useState("");
     const [clientEmail, setClientEmail] = useState("");
-    const [invoiceDate, setInvoiceDate] = useState("");
-    const [dueDate, setDueDate] = useState("");
+    const [invoiceDate, setInvoiceDate] = useState<Date>();
+    const [dueDate, setDueDate] = useState<Date>();
     const [items, setItems] = useState([{ desc: "", qty: 1, price: "" }]);
     const [notes, setNotes] = useState("");
     const [showNotes, setShowNotes] = useState(false);
+
+    // Mobile Drawer State
+    const [showMobilePreview, setShowMobilePreview] = useState(false);
 
     const addItem = () => setItems([...items, { desc: "", qty: 1, price: "" }]);
     const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
@@ -33,12 +39,17 @@ export default function CreateInvoice() {
 
     return (
         <AppLayout>
-            <div className="space-y-6 pb-8">
+            <motion.div
+                className="space-y-6 pb-8"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white lg:bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
+                        <button onClick={() => navigate("/invoices")} className="w-10 h-10 rounded-full bg-white lg:bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
                             <ArrowLeft size={18} />
                         </button>
                         <div>
@@ -46,8 +57,16 @@ export default function CreateInvoice() {
                             <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">Send a professional invoice to your client</p>
                         </div>
                     </div>
+
+                    {/* Mobile Preview Button (Header) */}
+                    <div className="lg:hidden flex">
+                        <button onClick={() => setShowMobilePreview(true)} className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 transition-colors">
+                            <Eye size={18} />
+                        </button>
+                    </div>
+
                     <div className="hidden lg:flex items-center gap-3">
-                        <button onClick={() => navigate(-1)} className="px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
+                        <button onClick={() => navigate("/invoices")} className="px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
                             Cancel
                         </button>
                         <button onClick={() => navigate("/invoices")} className="px-6 py-2.5 rounded-full text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center gap-2">
@@ -78,17 +97,11 @@ export default function CreateInvoice() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-gray-700">Invoice Date</Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                                        <Input type="date" className="pl-8 bg-white h-11" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} />
-                                    </div>
+                                    <DatePicker date={invoiceDate} setDate={setInvoiceDate} placeholder="Select date" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-gray-700">Due Date</Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                                        <Input type="date" className="pl-8 bg-white h-11" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-                                    </div>
+                                    <DatePicker date={dueDate} setDate={setDueDate} placeholder="Select due date" />
                                 </div>
                             </div>
                         </div>
@@ -206,19 +219,33 @@ export default function CreateInvoice() {
                                             {invoiceDate && (
                                                 <div className="flex justify-between">
                                                     <span className="text-gray-400">Date</span>
-                                                    <span className="font-medium text-gray-900">{invoiceDate}</span>
+                                                    <span className="font-medium text-gray-900">{format(invoiceDate, "PPP")}</span>
                                                 </div>
                                             )}
                                             {dueDate && (
                                                 <div className="flex justify-between">
                                                     <span className="text-gray-400">Due</span>
-                                                    <span className="font-medium text-gray-900">{dueDate}</span>
+                                                    <span className="font-medium text-gray-900">{format(dueDate, "PPP")}</span>
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
-                                    <p className="text-[10px] text-gray-400 text-center pt-2">Powered by PayLink</p>
+                                    {/* Link & QR Code */}
+                                    <div className="border-t border-gray-100 pt-5 mt-2 flex flex-col items-center justify-center space-y-3">
+                                        <div className="p-2 bg-white border border-gray-100 shadow-sm rounded-xl">
+                                            <QrCode size={64} className="text-gray-900" strokeWidth={1.5} />
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">Scan or Click to Pay</p>
+                                            <div className="flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full font-medium">
+                                                <Link2 size={12} />
+                                                paylink.app/i/INV-102
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[10px] text-gray-400 text-center pt-3 border-t border-gray-100/60 mt-4">Powered by PayLink</p>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +253,7 @@ export default function CreateInvoice() {
                 </div>
 
                 {/* ═══ MOBILE: Single Column ═══ */}
-                <div className="lg:hidden bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div className="lg:hidden bg-white rounded-2xl border border-gray-100 overflow-hidden mb-24">
 
                     {/* Client */}
                     <div className="p-5 space-y-4 border-b border-gray-100">
@@ -241,11 +268,11 @@ export default function CreateInvoice() {
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-2">
                                 <Label className="text-sm font-medium text-gray-700">Date</Label>
-                                <Input type="date" className="bg-white h-10" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} />
+                                <DatePicker date={invoiceDate} setDate={setInvoiceDate} />
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-sm font-medium text-gray-700">Due</Label>
-                                <Input type="date" className="bg-white h-10" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                                <DatePicker date={dueDate} setDate={setDueDate} />
                             </div>
                         </div>
                     </div>
@@ -267,15 +294,116 @@ export default function CreateInvoice() {
                         </div>
                     </div>
 
-                    {/* Submit */}
-                    <div className="p-5 flex gap-3">
-                        <button onClick={() => navigate(-1)} className="flex-1 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 transition-colors">Cancel</button>
-                        <button onClick={() => navigate("/invoices")} className="flex-[2] py-3 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2">
-                            <Check size={16} /> Create Invoice
+                    {/* Sticky Submit Bar */}
+                    <div className="fixed bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 flex gap-3 z-[60] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] pb-8 pointer-events-auto">
+                        <button onClick={() => navigate("/invoices")} className="flex-1 py-3 md:py-3.5 rounded-xl text-[15px] font-medium text-gray-600 border border-gray-200 transition-colors">Cancel</button>
+                        <button onClick={() => navigate("/invoices")} className="flex-[2] py-3 md:py-3.5 rounded-xl text-[15px] font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2">
+                            <Check size={18} /> Create Invoice
                         </button>
                     </div>
                 </div>
-            </div>
+
+                {/* ═══ MOBILE: Live Preview Modal/Drawer ═══ */}
+                {showMobilePreview && (
+                    <div className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-sm lg:hidden flex flex-col justify-end" onClick={() => setShowMobilePreview(false)}>
+                        <motion.div
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="bg-gray-50 w-full h-[85vh] rounded-t-[32px] flex flex-col overflow-hidden shadow-2xl"
+                            onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing
+                        >
+                            {/* Drawer Handle & Header */}
+                            <div className="bg-white px-6 pt-4 pb-4 border-b border-gray-100 flex-shrink-0">
+                                <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4" />
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-lg font-bold text-gray-900">Invoice Preview</h2>
+                                    <button onClick={() => setShowMobilePreview(false)} className="text-gray-400 hover:text-gray-900 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center">
+                                        <Check size={16} className="text-gray-900" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Drawer Content (The Preview itself) */}
+                            <div className="flex-1 overflow-y-auto p-5 pb-10">
+                                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm mx-auto max-w-sm overflow-hidden">
+                                    {/* Preview Reused Code */}
+                                    <div className="p-5 space-y-5">
+                                        {/* From */}
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-bold shrink-0">
+                                                {(user.business?.name || user.firstName || "P")[0]}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-400">From</p>
+                                                <p className="text-sm font-semibold text-gray-900">{user.business?.name || `${user.firstName} ${user.lastName}`}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Bill To */}
+                                        <div className="border-t border-gray-100 pt-4">
+                                            <p className="text-xs text-gray-400 mb-1">Bill To</p>
+                                            <p className="text-sm font-semibold text-gray-900">{client || "Client Name"}</p>
+                                            {clientEmail && <p className="text-xs text-gray-500 mt-0.5">{clientEmail}</p>}
+                                        </div>
+
+                                        {/* Items */}
+                                        {items.some(i => i.desc) && (
+                                            <div className="border-t border-gray-100 pt-4 space-y-2">
+                                                {items.filter(i => i.desc).map((item, i) => (
+                                                    <div key={i} className="flex justify-between text-sm">
+                                                        <span className="text-gray-500">{item.desc} × {item.qty}</span>
+                                                        <span className="font-semibold text-gray-900">₦{(Number(item.qty) * Number(item.price || 0)).toLocaleString()}</span>
+                                                    </div>
+                                                ))}
+                                                <div className="border-t border-gray-100 pt-2 mt-2 flex justify-between text-sm">
+                                                    <span className="font-medium text-gray-700">Total</span>
+                                                    <span className="font-bold text-gray-900">{totalDisplay}</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Dates */}
+                                        {(invoiceDate || dueDate) && (
+                                            <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
+                                                {invoiceDate && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-400">Date</span>
+                                                        <span className="font-medium text-gray-900">{format(invoiceDate, "PPP")}</span>
+                                                    </div>
+                                                )}
+                                                {dueDate && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-400">Due</span>
+                                                        <span className="font-medium text-gray-900">{format(dueDate, "PPP")}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Link & QR Code */}
+                                        <div className="border-t border-gray-100 pt-5 mt-2 flex flex-col items-center justify-center space-y-3">
+                                            <div className="p-2 bg-white border border-gray-100 shadow-sm rounded-xl">
+                                                <QrCode size={64} className="text-gray-900" strokeWidth={1.5} />
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">Scan or Click to Pay</p>
+                                                <div className="flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full font-medium">
+                                                    <Link2 size={12} />
+                                                    paylink.app/i/INV-102
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-[10px] text-gray-400 text-center pt-3 border-t border-gray-100/60 mt-4">Powered by PayLink</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </motion.div>
         </AppLayout>
     );
 }

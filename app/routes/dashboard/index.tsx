@@ -30,6 +30,24 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/auth";
 import { getGreeting } from "~/lib/utils";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
+
+const container: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.08
+        }
+    }
+};
+
+const item: Variants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
+
 
 
 export default function Dashboard() {
@@ -45,13 +63,13 @@ export default function Dashboard() {
 
                 {/* Business Setup Warning */}
                 {hasNoBusiness && (
-                    <div className="w-full bg-[#FFFAEB] flex items-start gap-3 px-4 py-3.5 rounded-xl border border-[#FFE4A8]">
+                    <div className="w-full bg-[#FFFAEB] flex items-start gap-3 px-4 py-3.5 rounded-[16px] border border-[#FFE4A8]">
                         <img src="/dashboard/warning-2.svg" alt="warning" className="mt-0.5" />
                         <div className="text-sm text-gray-800">
-                            <p className="font-semibold">Create Your Business Profile</p>
-                            <p className="mt-0.5 text-xs">
-                                Set up your business profile to start creating and managing collections.{" "}
-                                <Link to="/profile" className="text-[#B45309] font-semibold hover:underline">Set up now →</Link>
+                            <p className="font-semibold text-amber-900">Complete Your Setup</p>
+                            <p className="mt-0.5 text-xs text-amber-700/80">
+                                You need a business profile to create collections.{" "}
+                                <Link to="/profile" className="text-amber-900 font-bold hover:underline">Set up now →</Link>
                             </p>
                         </div>
                     </div>
@@ -86,22 +104,20 @@ export default function Dashboard() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => navigate("/collections/create")}
-                            className="flex-1 flex items-center justify-center gap-2 h-[48px] bg-white rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 active:bg-gray-50 transition-colors"
+                            className="flex items-center justify-center gap-2 h-12 bg-blue-600 rounded-xl text-sm font-bold text-white shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
                         >
-                            <Send size={16} className="text-gray-700" />
-                            Create
+                            <Plus size={18} />
+                            Create Link
                         </button>
                         <button
-                            className="flex-1 flex items-center justify-center gap-2 h-[48px] bg-white rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 active:bg-gray-50 transition-colors"
+                            onClick={() => navigate("/invoices")}
+                            className="flex items-center justify-center gap-2 h-12 bg-white rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 shadow-sm active:bg-gray-50 transition-all"
                         >
-                            <QrCode size={16} className="text-gray-700" />
-                            Share
-                        </button>
-                        <button className="h-[48px] w-[48px] shrink-0 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-600 active:bg-gray-50 transition-colors">
-                            <Download size={18} />
+                            <Share2 size={16} className="text-gray-600" />
+                            Share Link
                         </button>
                     </div>
 
@@ -137,13 +153,13 @@ export default function Dashboard() {
                             </Link>
                         </div>
 
-                        <div className="space-y-1">
+                        <motion.div variants={container} initial="hidden" animate="show" className="space-y-1">
                             {[
                                 { name: "David Musa", desc: "Project Dues", amount: "₦20,000", time: "2h ago", type: "credit" },
                                 { name: "Grace John", desc: "Birthday Fund", amount: "₦15,000", time: "5h ago", type: "credit" },
                                 { name: "Tola Adeniyi", desc: "Class Dues", amount: "₦5,000", time: "1d ago", type: "credit" },
                             ].map((tx, i) => (
-                                <div key={i} className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0">
+                                <motion.div variants={item} key={i} className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0">
                                     <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                                         {tx.type === "credit" ? (
                                             <ArrowDownLeft size={18} className="text-gray-600" />
@@ -160,9 +176,9 @@ export default function Dashboard() {
                                             {tx.amount}
                                         </p>
                                     </div>
-                                </div>
+                                </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
@@ -201,14 +217,14 @@ export default function Dashboard() {
                 </div>
 
                 {/* KPI Cards */}
-                <div className="hidden lg:grid grid-cols-4 gap-5">
+                <motion.div variants={container} initial="hidden" animate="show" className="hidden lg:grid grid-cols-4 gap-5">
                     {[
                         { label: "Total Collected", value: "₦1,250,000", change: "+12.4%", icon: Wallet, iconBg: "bg-blue-50", iconColor: "text-blue-600", sub: "from 186 contributors" },
                         { label: "Active Collections", value: "4", change: "2 near goal", icon: Layers, iconBg: "bg-purple-50", iconColor: "text-purple-600", sub: "₦485,000 pending" },
                         { label: "Completed", value: "12", change: "100% success", icon: CheckCircle2, iconBg: "bg-green-50", iconColor: "text-green-600", sub: "₦2.4M total collected" },
                         { label: "Contributors", value: "186", change: "+24 this month", icon: Users, iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "89% completion rate" },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-gray-200 transition-colors">
+                        <motion.div variants={item} key={i} className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-gray-200 transition-colors">
                             <div className="flex items-center justify-between">
                                 <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
                                     <stat.icon className={stat.iconColor} size={18} />
@@ -223,9 +239,9 @@ export default function Dashboard() {
                                 <h3 className="text-2xl font-bold text-gray-900 mt-1 tracking-tight">{stat.value}</h3>
                                 <p className="text-[11px] text-gray-400 mt-1">{stat.sub}</p>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Two-Column Layout */}
                 <div className="hidden lg:grid grid-cols-3 gap-6">
@@ -252,44 +268,46 @@ export default function Dashboard() {
                             <div className="col-span-2 text-right">Actions</div>
                         </div>
 
-                        {[
-                            { name: "Final Year Project Dues", collected: "₦300,000", target: "₦500,000", progress: 60, contributors: 32, deadline: "Mar 20" },
-                            { name: "Class Dues — 400L", collected: "₦85,000", target: "₦150,000", progress: 57, contributors: 17, deadline: "Apr 1" },
-                            { name: "Birthday Gift for Tola", collected: "₦42,000", target: "₦50,000", progress: 84, contributors: 14, deadline: "Feb 28" },
-                            { name: "Office Lunch Fund", collected: "₦18,500", target: "₦30,000", progress: 62, contributors: 7, deadline: "Mar 5" },
-                        ].map((col, i) => (
-                            <div key={i}
-                                className="grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group"
-                                onClick={() => navigate(`/collections/${i + 1}`)}
-                            >
-                                <div className="col-span-4">
-                                    <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
-                                    <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
-                                </div>
-                                <div className="col-span-2 text-right"><p className="text-sm font-semibold text-gray-900">{col.collected}</p></div>
-                                <div className="col-span-2 text-right"><p className="text-sm text-gray-500">{col.target}</p></div>
-                                <div className="col-span-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className={`h-full rounded-full ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
-                                        </div>
-                                        <span className="text-[11px] font-medium text-gray-500 w-8 text-right">{col.progress}%</span>
+                        <motion.div variants={container} initial="hidden" animate="show">
+                            {[
+                                { name: "Final Year Project Dues", collected: "₦300,000", target: "₦500,000", progress: 60, contributors: 32, deadline: "Mar 20" },
+                                { name: "Class Dues — 400L", collected: "₦85,000", target: "₦150,000", progress: 57, contributors: 17, deadline: "Apr 1" },
+                                { name: "Birthday Gift for Tola", collected: "₦42,000", target: "₦50,000", progress: 84, contributors: 14, deadline: "Feb 28" },
+                                { name: "Office Lunch Fund", collected: "₦18,500", target: "₦30,000", progress: 62, contributors: 7, deadline: "Mar 5" },
+                            ].map((col, i) => (
+                                <motion.div variants={item} key={i}
+                                    className="grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group"
+                                    onClick={() => navigate(`/collections/${i + 1}`)}
+                                >
+                                    <div className="col-span-4">
+                                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">{col.contributors} contributors · Due {col.deadline}</p>
                                     </div>
-                                </div>
-                                <div className="col-span-2 flex items-center justify-end gap-1">
-                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link"><Copy size={14} /></button>
-                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share"><ExternalLink size={14} /></button>
-                                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"><MoreHorizontal size={14} /></button>
-                                </div>
-                            </div>
-                        ))}
+                                    <div className="col-span-2 text-right"><p className="text-sm font-semibold text-gray-900">{col.collected}</p></div>
+                                    <div className="col-span-2 text-right"><p className="text-sm text-gray-500">{col.target}</p></div>
+                                    <div className="col-span-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div className={`h-full rounded-full ${col.progress >= 80 ? "bg-green-500" : "bg-blue-600"}`} style={{ width: `${col.progress}%` }} />
+                                            </div>
+                                            <span className="text-[11px] font-medium text-gray-500 w-8 text-right">{col.progress}%</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 flex items-center justify-end gap-1">
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link"><Copy size={14} /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share"><ExternalLink size={14} /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"><MoreHorizontal size={14} /></button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
                     </div>
 
                     {/* Right Column */}
                     <div className="space-y-6">
 
                         {/* Revenue */}
-                        <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                        <motion.div variants={item} className="bg-white border border-gray-100 rounded-2xl p-5">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-sm font-semibold text-gray-900">Revenue Trend</h3>
                                 <BarChart3 size={16} className="text-gray-400" />
@@ -311,7 +329,7 @@ export default function Dashboard() {
                                     <TrendingUp size={12} /> +18.2%
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Recent Payments */}
                         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
@@ -319,7 +337,7 @@ export default function Dashboard() {
                                 <h3 className="text-sm font-semibold text-gray-900">Recent Payments</h3>
                                 <Link to="/contributors" className="text-xs text-blue-600 font-medium hover:underline">All</Link>
                             </div>
-                            <div className="divide-y divide-gray-50">
+                            <motion.div variants={container} initial="hidden" animate="show" className="divide-y divide-gray-50">
                                 {[
                                     { name: "David Musa", collection: "Project Dues", amount: "₦20,000", time: "2h ago" },
                                     { name: "Grace John", collection: "Birthday Fund", amount: "₦15,000", time: "5h ago" },
@@ -327,7 +345,7 @@ export default function Dashboard() {
                                     { name: "Ayo Badmus", collection: "Project Dues", amount: "₦20,000", time: "1d ago" },
                                     { name: "Chioma Okeke", collection: "Office Lunch", amount: "₦3,000", time: "2d ago" },
                                 ].map((p, i) => (
-                                    <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50/50 transition-colors">
+                                    <motion.div variants={item} key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50/50 transition-colors">
                                         <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-600 shrink-0">
                                             {p.name.split(" ").map(n => n[0]).join("")}
                                         </div>
@@ -336,10 +354,11 @@ export default function Dashboard() {
                                             <p className="text-[10px] text-gray-400 truncate">{p.collection} · {p.time}</p>
                                         </div>
                                         <p className="text-xs font-bold text-gray-900 shrink-0">{p.amount}</p>
-                                    </div>
+                                    </motion.div>
                                 ))}
-                            </div>
+                            </motion.div>
                         </div>
+
 
                         {/* Reports */}
                         <div className="bg-white border border-gray-100 rounded-2xl p-5">

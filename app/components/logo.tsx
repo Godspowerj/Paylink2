@@ -1,25 +1,27 @@
 import { Link } from "react-router";
-import { Link2 } from "lucide-react";
+import { cn } from "~/lib/utils";
 
-const Logo = ({ size = "default" }: { size?: "small" | "default" | "large" }) => {
-  const sizeClasses = {
-    small: "text-lg",
-    default: "text-xl",
-    large: "text-2xl",
-    extralarge: "text-3xl",
-  };
+// Moniepoint-style solid blue
+const BLUE = "#0361F0";
 
-  const iconSize = {
-    small: 18,
-    default: 22,
-    large: 26,
-    extralarge: 30,
+const Logo = ({ size = "default", className }: { size?: "small" | "default" | "large" | "hero"; className?: string }) => {
+  const textClass = {
+    small: "text-[18px]",
+    default: "text-[22px]",
+    large: "text-[28px]",
+    hero: "text-[42px]",
   };
 
   return (
-    <Link to="/" className="flex items-center gap-2 font-bold tracking-tight text-primary">
-      <Link2 size={iconSize[size]} className="rotate-[-45deg]" />
-      <span className={sizeClasses[size]}>Paylink</span>
+    <Link to="/" className={cn("flex items-center group", className)}>
+      {/* Wordmark Only Logo */}
+      <span
+        className={cn("font-bold tracking-tight", textClass[size])}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      >
+        <span style={{ color: BLUE }}>Pay</span>
+        <span className="text-[#0F172A]">link</span>
+      </span>
     </Link>
   );
 };
