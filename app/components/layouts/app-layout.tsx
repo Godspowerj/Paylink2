@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { X, LayoutDashboard, Layers, Users, Settings, CreditCard, Bell, BarChart3, FileText, HelpCircle, LogOut } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import Logo from "../logo";
 import { ChevronDownIcon, DashboardIcon, Layers01Icon, LogoutIcon, MenuIcon, NotificationIcon, SettingsIcon, UserIcon } from "../svgs";
 import { cn, getGreeting } from "~/lib/utils";
@@ -190,7 +191,14 @@ const AppLayout = ({ children, className }: { children: React.ReactNode; classNa
 
         {/* ═══ PAGE CONTENT ═══ */}
         <div className="w-full max-w-full overflow-x-hidden px-5 lg:px-8 pt-2 lg:pt-6 pb-24 lg:pb-10">
-          {children}
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {children}
+          </motion.div>
         </div>
 
         <MobileBottomNav />

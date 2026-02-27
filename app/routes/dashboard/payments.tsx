@@ -3,7 +3,7 @@ import { Search, Filter, Download, ArrowDownLeft, ArrowUpRight, Wallet, Trending
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
 import { PageSkeleton } from "~/components/ui/skeleton";
-import { toast } from "sonner";
+import { pToast } from "~/lib/toast";
 
 const payments = [
     { id: "TXN-001", name: "David Musa", email: "david@mail.com", collection: "Project Dues", amount: "₦20,000", date: "Feb 26, 2026", time: "2:30 PM", status: "completed", type: "credit" },
@@ -54,7 +54,7 @@ export default function Payments() {
                         <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">Track all incoming payments across your collections</p>
                     </div>
                     <div className="hidden lg:flex items-center gap-2">
-                        <button onClick={() => toast.success("Export started — check your downloads")} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                        <button onClick={() => pToast.success("Export started", "Check your downloads")} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
                             <Download size={14} /> Export
                         </button>
                     </div>
@@ -166,27 +166,39 @@ export default function Payments() {
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="lg:hidden space-y-2">
+                <div className="lg:hidden space-y-3 pb-6">
                     {filtered.map((p, i) => (
-                        <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                    <ArrowDownLeft size={18} className="text-gray-600" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-gray-900">{p.name}</p>
-                                    <p className="text-xs text-gray-500 truncate">{p.collection} · {p.date}</p>
+                        <div key={i} className="bg-white rounded-[20px] border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                        <Wallet size={18} className="text-blue-600" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-gray-900">{p.name}</p>
+                                        <span className={cn(
+                                            "inline-flex text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider mt-1",
+                                            p.status === "completed" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                                                p.status === "pending" ? "bg-amber-50 text-amber-700 border-amber-100" :
+                                                    "bg-red-50 text-red-600 border-red-100"
+                                        )}>
+                                            {p.status}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <p className="text-sm font-bold text-emerald-600">+{p.amount}</p>
-                                    <span className={cn(
-                                        "text-[9px] font-semibold px-1.5 py-0.5 rounded-full capitalize",
-                                        p.status === "completed" ? "bg-emerald-50 text-emerald-700" :
-                                            p.status === "pending" ? "bg-amber-50 text-amber-700" :
-                                                "bg-red-50 text-red-600"
-                                    )}>
-                                        {p.status}
-                                    </span>
+                                    <p className="text-base font-bold text-emerald-600">+{p.amount}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 bg-gray-50/50 p-2.5 rounded-xl border border-gray-50 mt-2">
+                                <div>
+                                    <p className="font-medium text-gray-400 mb-0.5">Collection</p>
+                                    <p className="text-gray-900 font-semibold truncate">{p.collection}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-medium text-gray-400 mb-0.5">Date</p>
+                                    <p className="text-gray-900 font-semibold">{p.date}</p>
                                 </div>
                             </div>
                         </div>

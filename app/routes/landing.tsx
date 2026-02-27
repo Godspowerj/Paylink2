@@ -162,11 +162,8 @@ function NavbarFloating() {
             <div className="pointer-events-auto h-[60px] pl-6 pr-2 bg-white/80 backdrop-blur-md border border-gray-200/50 rounded-full shadow-lg shadow-gray-200/20 flex items-center justify-between w-full max-w-[1000px] transition-all duration-300 ease-in-out">
 
                {/* Logo */}
-               <div className="flex items-center gap-2 mr-auto" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                  <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm shadow-blue-200">
-                     <Link2 size={18} className="-rotate-45" />
-                  </div>
-                  <span className="font-bold text-gray-900 text-lg tracking-tight hidden sm:block">Paylink</span>
+               <div className="flex items-center mr-auto" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                  <Logo size="default" />
                </div>
 
                {/* Desktop Links */}

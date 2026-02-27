@@ -4,6 +4,22 @@ import { useState } from "react";
 import { Input } from "~/components/ui/input";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
+import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
+
+const container: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+};
+
+const itemAnim: Variants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
+
 
 const collections = [
   { id: "1", name: "Final Year Project Dues", description: "Final year class dues collection", collected: "₦300,000", target: "₦500,000", contributors: 32, status: "active", date: "Dec 15, 2025", deadline: "Mar 20, 2026", progress: 60 },
@@ -52,24 +68,24 @@ export default function Collections() {
         </div>
 
         {/* ═══ DESKTOP: Stats Row ═══ */}
-        <div className="hidden lg:grid grid-cols-4 gap-4">
+        <motion.div variants={container} initial="hidden" animate="show" className="hidden lg:grid grid-cols-4 gap-4">
           {[
             { label: "Total Collections", value: stats.total, icon: Layers, bg: "bg-blue-50", color: "text-blue-600" },
             { label: "Active", value: stats.active, icon: TrendingUp, bg: "bg-emerald-50", color: "text-emerald-600" },
             { label: "Completed", value: stats.closed, icon: FolderOpen, bg: "bg-gray-50", color: "text-gray-600" },
             { label: "Total Collected", value: stats.totalCollected, icon: Users, bg: "bg-purple-50", color: "text-purple-600" },
           ].map((s, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3">
+            <motion.div variants={itemAnim} key={i} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-4 hover:border-gray-200 transition-colors">
               <div className={cn("p-2.5 rounded-xl", s.bg)}>
                 <s.icon size={18} className={s.color} />
               </div>
               <div>
                 <p className="text-xs text-gray-500">{s.label}</p>
-                <p className="text-lg font-bold text-gray-900">{s.value}</p>
+                <h3 className="text-xl font-bold text-gray-900 leading-none tracking-tight">{s.value}</h3>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3">
@@ -113,69 +129,70 @@ export default function Collections() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
               <FolderOpen className="h-12 w-12 text-gray-200 mx-auto mb-3" />
-              <p className="text-sm text-gray-500 font-medium">No collections found</p>
+              <p className="text-sm text-gray-500 font-medium">No collections</p>
               <p className="text-xs text-gray-400 mt-1">Try adjusting your search or filters</p>
             </div>
           ) : (
-            filtered.map((col) => (
-              <div
-                key={col.id}
-                className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-50 hover:bg-gray-50/40 transition-colors cursor-pointer group"
-                onClick={() => navigate(`/collections/${col.id}`)}
-              >
-                <div className="col-span-4">
-                  <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">{col.description}</p>
-                  <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-                    <Calendar size={10} /> Created {col.date} · Due {col.deadline}
-                  </p>
-                </div>
-                <div className="col-span-2 text-right">
-                  <p className="text-sm font-bold text-gray-900">{col.collected}</p>
-                  <p className="text-[11px] text-gray-400">of {col.target}</p>
-                </div>
-                <div className="col-span-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={cn("h-full rounded-full transition-all", col.progress >= 100 ? "bg-emerald-500" : col.progress >= 80 ? "bg-green-500" : "bg-blue-600")}
-                        style={{ width: `${col.progress}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-semibold text-gray-600 w-10 text-right">{col.progress}%</span>
+            <motion.div variants={container} initial="hidden" animate="show">
+              {filtered.map((col) => (
+                <motion.div
+                  variants={itemAnim}
+                  key={col.id}
+                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-50 hover:bg-gray-50/40 transition-colors cursor-pointer group"
+                  onClick={() => navigate(`/collections/${col.id}`)}
+                >
+                  <div className="col-span-4">
+                    <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{col.name}</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">{col.description}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                      <Calendar size={10} /> Created {col.date} · Due {col.deadline}
+                    </p>
                   </div>
-                </div>
-                <div className="col-span-1 text-center">
-                  <span className="text-sm font-semibold text-gray-700">{col.contributors}</span>
-                </div>
-                <div className="col-span-1 flex justify-center">
-                  <span className={cn(
-                    "text-[10px] font-semibold px-2.5 py-1 rounded-full capitalize border",
-                    col.status === "active"
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                      : "bg-gray-50 text-gray-600 border-gray-200"
-                  )}>
-                    {col.status}
-                  </span>
-                </div>
-                <div className="col-span-2 flex items-center justify-end gap-1">
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="View">
-                    <Eye size={15} />
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link">
-                    <Copy size={15} />
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share">
-                    <ExternalLink size={15} />
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
-                    <MoreHorizontal size={15} />
-                  </button>
-                </div>
-              </div>
-            ))
+                  <div className="col-span-2 text-right">
+                    <p className="text-sm font-bold text-gray-900">{col.collected}</p>
+                    <p className="text-[11px] text-gray-400">of {col.target}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full transition-all", col.progress >= 100 ? "bg-emerald-500" : col.progress >= 80 ? "bg-green-500" : "bg-blue-600")}
+                          style={{ width: `${col.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold text-gray-600 w-10 text-right">{col.progress}%</span>
+                    </div>
+                  </div>
+                  <div className="col-span-1 text-center">
+                    <span className="text-sm font-semibold text-gray-700">{col.contributors}</span>
+                  </div>
+                  <div className="col-span-1 flex justify-center">
+                    <span className={cn(
+                      "text-[10px] font-semibold px-2.5 py-1 rounded-full capitalize border",
+                      col.status === "active"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                        : "bg-gray-50 text-gray-600 border-gray-200"
+                    )}>
+                      {col.status}
+                    </span>
+                  </div>
+                  <div className="col-span-2 flex items-center justify-end gap-1">
+                    <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="View">
+                      <Eye size={15} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link">
+                      <Copy size={15} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share">
+                      <ExternalLink size={15} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="More Options"><MoreHorizontal size={14} /></button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
           )}
         </div>
 

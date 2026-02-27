@@ -4,7 +4,9 @@ import { Link2, Shield } from "lucide-react";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { formatCurrency, mockCollections } from "~/data/mock-data";
+import Logo from "~/components/logo";
 import { Button } from "~/components/ui/button";
+import { motion } from "framer-motion";
 
 const PublicPayment = () => {
   const { slug } = useParams();
@@ -48,14 +50,16 @@ const PublicPayment = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="mb-6 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 text-xl font-bold text-primary">
-            <Link2 size={22} className="rotate-[-45deg]" />
-            Paylink
-          </div>
+        <div className="mb-6 flex justify-center text-center">
+          <Logo size="large" />
         </div>
 
-        <div className="rounded-xl border bg-card p-6 shadow-card">
+        <motion.div
+          className="rounded-xl border bg-card p-6 shadow-card"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
+        >
           <div className="mb-6 border-b pb-4">
             <h1 className="text-xl font-bold text-foreground">{collection.name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">Organized by {collection.organizer}</p>
@@ -94,7 +98,7 @@ const PublicPayment = () => {
           <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             <Shield size={12} /> Secured by Paylink
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

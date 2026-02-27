@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { useAuth } from "~/contexts/auth";
+import { DatePicker } from "~/components/ui/date-picker";
+import { motion } from "framer-motion";
 
 export default function CreateCollection() {
   const navigate = useNavigate();
@@ -25,10 +27,13 @@ export default function CreateCollection() {
   const [items, setItems] = useState([{ desc: "", qty: 1, price: "" }]);
   const [description, setDescription] = useState("");
   const [redirectUrl, setRedirectUrl] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
+  const [expirationDate, setExpirationDate] = useState<Date | undefined>();
   const [paymentLimit, setPaymentLimit] = useState("");
   const [customFields, setCustomFields] = useState<{ label: string; type: string }[]>([]);
   const [showOptional, setShowOptional] = useState(false);
+
+  // Mobile Drawer State
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   const addItem = () => setItems([...items, { desc: "", qty: 1, price: "" }]);
   const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
@@ -58,12 +63,17 @@ export default function CreateCollection() {
 
   return (
     <AppLayout>
-      <div className="space-y-6 pb-8">
+      <motion.div
+        className="space-y-6 pb-8"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white lg:bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
+            <button onClick={() => navigate("/collections")} className="w-10 h-10 rounded-full bg-white lg:bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
               <ArrowLeft size={18} />
             </button>
             <div>
@@ -71,9 +81,17 @@ export default function CreateCollection() {
               <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">Set up a new payment link</p>
             </div>
           </div>
+
+          {/* Mobile Preview Button (Header) */}
+          <div className="lg:hidden flex items-center">
+            <button onClick={() => setShowMobilePreview(true)} className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 transition-colors">
+              <Eye size={18} />
+            </button>
+          </div>
+
           {/* Desktop submit */}
           <div className="hidden lg:flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
+            <button onClick={() => navigate("/collections")} className="px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 border border-gray-200 transition-colors">
               Cancel
             </button>
             <button onClick={() => navigate("/collections")} className="px-6 py-2.5 rounded-full text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center gap-2">
@@ -108,10 +126,7 @@ export default function CreateCollection() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">Deadline</Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                    <Input type="date" className="pl-8 bg-white h-11" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} />
-                  </div>
+                  <DatePicker date={expirationDate} setDate={setExpirationDate} placeholder="Select date" className="mt-1" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -277,7 +292,7 @@ export default function CreateCollection() {
                       {expirationDate && (
                         <div className="flex justify-between">
                           <span className="text-gray-400">Deadline</span>
-                          <span className="font-medium text-gray-900">{expirationDate}</span>
+                          <span className="font-medium text-gray-900">{expirationDate.toLocaleDateString()}</span>
                         </div>
                       )}
                       {paymentLimit && (
@@ -308,7 +323,7 @@ export default function CreateCollection() {
         </div>
 
         {/* ═══ MOBILE: Single Column ═══ */}
-        <div className="lg:hidden bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="lg:hidden bg-white rounded-2xl border border-gray-100 overflow-hidden mb-24">
 
           {/* Title & Currency */}
           <div className="p-5 space-y-5 border-b border-gray-100">
@@ -377,7 +392,7 @@ export default function CreateCollection() {
               <div className="px-5 pb-5 pt-4 space-y-4 border-b border-gray-100">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">Deadline</Label>
-                  <Input type="date" className="bg-white h-10" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} />
+                  <DatePicker date={expirationDate} setDate={setExpirationDate} placeholder="Select date" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">Payment Limit</Label>
@@ -387,15 +402,86 @@ export default function CreateCollection() {
             )}
           </div>
 
-          {/* Submit */}
-          <div className="p-5 flex gap-3">
-            <button onClick={() => navigate(-1)} className="flex-1 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 transition-colors">Cancel</button>
-            <button onClick={() => navigate("/collections")} className="flex-[2] py-3 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2">
-              <Check size={16} /> Create Link
+          {/* Sticky Submit Bar */}
+          <div className="fixed bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100 flex gap-3 z-[60] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] pb-8 pointer-events-auto">
+            <button onClick={() => navigate("/collections")} className="flex-1 py-3 md:py-3.5 rounded-xl text-[15px] font-medium text-gray-600 border border-gray-200 transition-colors">Cancel</button>
+            <button onClick={() => navigate("/collections")} className="flex-[2] py-3 md:py-3.5 rounded-xl text-[15px] font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2">
+              <Check size={18} /> Create Link
             </button>
           </div>
         </div>
-      </div>
+
+        {/* ═══ MOBILE: Live Preview Modal/Drawer ═══ */}
+        {showMobilePreview && (
+          <div className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-sm lg:hidden flex flex-col justify-end" onClick={() => setShowMobilePreview(false)}>
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="bg-gray-50 w-full h-[85vh] rounded-t-[32px] flex flex-col overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing
+            >
+              {/* Drawer Handle & Header */}
+              <div className="bg-white px-6 pt-4 pb-4 border-b border-gray-100 flex-shrink-0">
+                <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4" />
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold text-gray-900">Live Preview</h2>
+                  <button onClick={() => setShowMobilePreview(false)} className="text-gray-400 hover:text-gray-900 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center">
+                    <Check size={16} className="text-gray-900" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Drawer Content (The Preview itself) */}
+              <div className="flex-1 overflow-y-auto p-5 pb-10">
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mx-auto max-w-sm">
+                  {/* Preview Content Re-used */}
+                  <div className="text-center pb-6 border-b border-gray-100">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl font-bold mb-4 shadow-sm border border-blue-100/50">
+                      {(user.business?.name || user.firstName || "P")[0]}
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900">{title || "Your Link Title"}</h3>
+                    <p className="text-sm text-gray-500 mt-1">by {user.business?.name || `${user.firstName} ${user.lastName}`}</p>
+                  </div>
+
+                  <div className="py-6 space-y-5">
+                    {description && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Description</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{description}</p>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Amount</p>
+                      {amountType === "fixed" ? (
+                        <p className="text-2xl font-bold text-gray-900">{sym}{(amount || "0.00")}</p>
+                      ) : (
+                        <div className="space-y-2.5">
+                          {items.map((item, i) => (
+                            <div key={i} className="flex justify-between items-center text-sm">
+                              <span className="text-gray-600 font-medium flex-1 truncate pr-4">{item.desc || `Item ${i + 1}`} <span className="text-gray-400 font-normal ml-1">×{item.qty}</span></span>
+                              <span className="font-semibold text-gray-900 text-right">{sym}{(Number(item.qty) * Number(item.price || 0)).toLocaleString()}</span>
+                            </div>
+                          ))}
+                          <div className="pt-2.5 mt-2.5 border-t border-gray-100 flex justify-between items-center bg-gray-50/50 -mx-2 px-2 py-2 rounded-lg">
+                            <span className="font-bold text-gray-900">Total</span>
+                            <span className="font-bold text-blue-600 text-lg">{totalDisplay}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Button disabled className="w-full h-12 rounded-xl text-[15px] font-bold shadow-sm opacity-50 bg-gray-900 text-white flex items-center justify-center gap-2">
+                    {"Pay Now"}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </motion.div>
     </AppLayout>
   );
 }

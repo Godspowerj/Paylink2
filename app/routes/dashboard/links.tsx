@@ -4,7 +4,8 @@ import { useNavigate } from "react-router";
 import AppLayout from "~/components/layouts/app-layout";
 import { cn } from "~/lib/utils";
 import { PageSkeleton } from "~/components/ui/skeleton";
-import { toast } from "sonner";
+import { pToast } from "~/lib/toast";
+import { motion } from "framer-motion";
 
 export default function PaymentLinks() {
     const navigate = useNavigate();
@@ -41,7 +42,12 @@ export default function PaymentLinks() {
 
     return (
         <AppLayout>
-            <div className="space-y-6">
+            <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            >
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -177,8 +183,8 @@ export default function PaymentLinks() {
                                 </div>
                                 <div className="col-span-2 flex items-center justify-end gap-1">
                                     <button onClick={(e) => { e.stopPropagation(); navigate(`/collections/${link.id}`); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="View"><Eye size={15} /></button>
-                                    <button onClick={(e) => { e.stopPropagation(); toast.success("Link copied to clipboard!"); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link"><Copy size={15} /></button>
-                                    <button onClick={(e) => { e.stopPropagation(); toast.success("Share link opened"); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share"><ExternalLink size={15} /></button>
+                                    <button onClick={(e) => { e.stopPropagation(); pToast.success("Link copied!", "Payment link copied to clipboard"); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Copy Link"><Copy size={15} /></button>
+                                    <button onClick={(e) => { e.stopPropagation(); pToast.info("Share link opened"); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition" title="Share"><ExternalLink size={15} /></button>
                                     <button onClick={(e) => { e.stopPropagation(); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"><MoreHorizontal size={15} /></button>
                                 </div>
                             </div>
@@ -225,7 +231,7 @@ export default function PaymentLinks() {
                         </div>
                     )}
                 </div>
-            </div>
+            </motion.div>
         </AppLayout>
     );
 }
