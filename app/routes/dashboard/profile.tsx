@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Edit2, Building2, Loader2, CheckCircle2 } from "lucide-react";
 import { useNavigate, Link } from "react-router";
 import { Label } from "~/components/ui/label";
@@ -10,7 +10,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { cn } from "~/lib/utils";
 import { useAuth } from "~/contexts/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { request } from "~/services/request";
 import type { BusinessProfileValues } from "~/@types";
 import { ErrorFeedback, SuccessFeedback } from "~/components/toast";
@@ -104,6 +104,8 @@ const bankDetailsSchema = Yup.object({
 
 // ─── MAIN PAGE ───
 export default function Profile() {
+  const { user } = useAuth();
+
   return (
     <AppLayout className="bg-[#f4f5f6]">
       <div className="max-w-2xl mx-auto">
@@ -119,7 +121,18 @@ export default function Profile() {
         </div>
 
         <BusinessProfile />
-        <BankingInformation />
+
+        {user?.business ? (
+          <BankingInformation />
+        ) : (
+          <div className="bg-gray-50/50 p-8 rounded-2xl text-center border border-dashed border-gray-200 mt-6 lg:mb-12">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
+              <Building2 size={24} className="text-gray-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Create Business Profile First</h3>
+            <p className="text-sm text-gray-500 max-w-xs mx-auto">Please set up your business profile above before connecting a payout bank account.</p>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
@@ -356,50 +369,122 @@ const BusinessProfile = () => {
   );
 };
 
+// ─── DEBOUNCE HOOK ───
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 // ─── BANKING INFORMATION ───
 const BankingInformation = () => {
   const { toast } = useToast();
-  const [verifying, setVerifying] = useState(false);
+  const queryClient = useQueryClient();
   const [accountVerified, setAccountVerified] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const bankList = [
-    { id: "044", name: "Access Bank" },
-    { id: "058", name: "Guaranty Trust Bank" },
-    { id: "057", name: "Zenith Bank" },
-    { id: "033", name: "United Bank for Africa (UBA)" },
-    { id: "214", name: "First City Monument Bank (FCMB)" },
-    { id: "232", name: "Sterling Bank" },
-    { id: "032", name: "Union Bank of Nigeria" },
-    { id: "035", name: "Wema Bank" },
-    { id: "050", name: "Ecobank Nigeria" },
-    { id: "301", name: "Jaiz Bank" },
-    { id: "011", name: "First Bank of Nigeria" },
-  ];
+  const [bankSearch, setBankSearch] = useState("");
+  const [showBankDropdown, setShowBankDropdown] = useState(false);
+  const debouncedBankSearch = useDebounce(bankSearch, 300);
+
+  // 1. Fetch Banks List from API using Search
+  const { data: bankResponse, isLoading: banksLoading } = useQuery({
+    queryKey: ["banks", debouncedBankSearch],
+    queryFn: async () => {
+      const url = debouncedBankSearch
+        ? `/banks/search?q=${encodeURIComponent(debouncedBankSearch)}`
+        : "/banks";
+      const response = await request.get(url);
+      return response.data?.data || [];
+    },
+  });
+
+  const activeBankList = Array.isArray(bankResponse) ? bankResponse : [];
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowBankDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // 2. Verify Account API Mutation
+  const verifyAccountMutation = useMutation({
+    mutationFn: async (payload: { accountNumber: string; bankCode: string }) => {
+      const response = await request.post("/banks/verify-account", payload);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // Assuming the backend returns the verified name in data.data.account_name or data.data.accountName
+      const accountName = data?.data?.account_name || data?.data?.accountName || "VERIFIED ACCOUNT";
+      formik.setFieldValue("accountName", accountName);
+      setAccountVerified(true);
+    },
+    onError: (error: any) => {
+      formik.setFieldValue("accountName", "");
+      setAccountVerified(false);
+      const msg = error?.response?.data?.message || "Could not verify account details";
+      toast({ title: "Verification Failed", description: msg, variant: "destructive" });
+    },
+  });
+
+  // 3. Connect Paystack Mutation
+  const connectPaystackMutation = useMutation({
+    mutationFn: async (payload: { accountNumber: string; bankCode: string }) => {
+      const response = await request.post("/businesses/connect-paystack", payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      toast({ title: "Bank Details Saved", description: "Payouts will now be sent to this account." });
+    },
+    onError: (error: any) => {
+      const msg = error?.response?.data?.message || "Could not save bank details";
+      toast({ title: "Error Saving Bank", description: msg, variant: "destructive" });
+    },
+  });
 
   const formik = useFormik({
     initialValues: {
       accountNumber: "",
-      bankName: "",
+      bankCode: "",
       accountName: "",
     },
-    validationSchema: bankDetailsSchema,
+    validationSchema: Yup.object({
+      accountNumber: Yup.string().matches(/^\d+$/, "Digits only").min(10).max(10).required("Account number is required"),
+      bankCode: Yup.string().required("Please select a bank"),
+      accountName: Yup.string().required("Account name is required"),
+    }),
     onSubmit: (values) => {
-      toast({ title: "Bank Details Saved", description: "Payouts will now be sent to this account." });
+      connectPaystackMutation.mutate({
+        accountNumber: values.accountNumber,
+        bankCode: values.bankCode,
+      });
     },
     validateOnMount: true,
   });
 
-  // Simulate account verification
   const handleVerify = () => {
-    if (formik.values.accountNumber.length >= 10 && formik.values.bankName) {
-      setVerifying(true);
-      setTimeout(() => {
-        formik.setFieldValue("accountName", "JONAH GODSPOWER");
-        setAccountVerified(true);
-        setVerifying(false);
-      }, 1500);
+    if (formik.values.accountNumber.length === 10 && formik.values.bankCode) {
+      verifyAccountMutation.mutate({
+        accountNumber: formik.values.accountNumber,
+        bankCode: formik.values.bankCode,
+      });
     }
   };
+
+
 
   return (
     <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
@@ -414,30 +499,56 @@ const BankingInformation = () => {
       </div>
 
       <form onSubmit={formik.handleSubmit} className="space-y-5">
-        {/* Bank Select */}
-        <div className="space-y-2">
+        {/* Bank Search Select */}
+        <div className="space-y-2 relative" ref={dropdownRef}>
           <Label>Select Bank</Label>
-          <Select
-            value={formik.values.bankName}
-            onValueChange={(val) => {
-              formik.setFieldValue("bankName", val);
-              setAccountVerified(false);
-              formik.setFieldValue("accountName", "");
+          <Input
+            value={bankSearch}
+            onChange={(e) => {
+              setBankSearch(e.target.value);
+              setShowBankDropdown(true);
+              if (formik.values.bankCode) {
+                formik.setFieldValue("bankCode", "");
+                setAccountVerified(false);
+                formik.setFieldValue("accountName", "");
+              }
             }}
-          >
-            <SelectTrigger className="h-11 bg-gray-50/50 border-gray-200">
-              <SelectValue placeholder="Choose your bank" />
-            </SelectTrigger>
-            <SelectContent>
-              {bankList.map((bank) => (
-                <SelectItem key={bank.id} value={bank.name}>
-                  {bank.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {formik.touched.bankName && formik.errors.bankName && (
-            <p className="text-xs text-destructive">{formik.errors.bankName}</p>
+            onFocus={() => setShowBankDropdown(true)}
+            placeholder="Search and select your bank..."
+            className={cn(
+              "h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all",
+              formik.touched.bankCode && formik.errors.bankCode && "border-destructive focus-visible:ring-destructive"
+            )}
+          />
+          {showBankDropdown && (
+            <div className="absolute z-10 w-full bg-white border border-gray-100 shadow-xl rounded-xl mt-1 max-h-60 overflow-y-auto">
+              {banksLoading ? (
+                <div className="p-3 text-sm text-gray-500 text-center flex items-center justify-center gap-2">
+                  <Loader2 className="animate-spin h-4 w-4" /> Loading banks...
+                </div>
+              ) : activeBankList.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500 text-center">No banks found</div>
+              ) : (
+                activeBankList.map((bank: any) => (
+                  <div
+                    key={bank.code || bank.id}
+                    className="p-3 hover:bg-gray-50 text-sm cursor-pointer border-b border-gray-50 last:border-0 font-medium text-gray-700 transition-colors"
+                    onClick={() => {
+                      formik.setFieldValue("bankCode", bank.code || bank.id);
+                      setBankSearch(bank.name);
+                      setShowBankDropdown(false);
+                      setAccountVerified(false);
+                      formik.setFieldValue("accountName", "");
+                    }}
+                  >
+                    {bank.name}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+          {formik.touched.bankCode && formik.errors.bankCode && (
+            <p className="text-xs text-destructive">{formik.errors.bankCode as string}</p>
           )}
         </div>
 
@@ -461,28 +572,28 @@ const BankingInformation = () => {
                 formik.touched.accountNumber && formik.errors.accountNumber && "border-destructive focus-visible:ring-destructive"
               )}
             />
-            {verifying && (
+            {verifyAccountMutation.isPending && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <Loader2 className="animate-spin text-blue-600" size={18} />
               </div>
             )}
           </div>
           {formik.touched.accountNumber && formik.errors.accountNumber && (
-            <p className="text-xs text-destructive">{formik.errors.accountNumber}</p>
+            <p className="text-xs text-destructive">{formik.errors.accountNumber as string}</p>
           )}
           <p className="text-xs text-gray-500">Enter your 10-digit NUBAN account number.</p>
         </div>
 
         {/* Verify Button */}
-        {formik.values.accountNumber.length >= 10 && formik.values.bankName && !accountVerified && (
+        {formik.values.accountNumber.length === 10 && formik.values.bankCode && !accountVerified && (
           <Button
             type="button"
             variant="outline"
             onClick={handleVerify}
-            disabled={verifying}
+            disabled={verifyAccountMutation.isPending}
             className="rounded-full h-9 text-sm"
           >
-            {verifying ? (
+            {verifyAccountMutation.isPending ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
             ) : (
               "Verify Account"
@@ -505,7 +616,8 @@ const BankingInformation = () => {
         <div className="pt-2">
           <Button
             className="w-full md:w-auto min-w-[200px] h-11 rounded-full gap-2 font-medium"
-            disabled={!formik.isValid || !accountVerified}
+            disabled={!formik.isValid || !accountVerified || connectPaystackMutation.isPending}
+            isLoading={connectPaystackMutation.isPending}
           >
             Save Bank Details
           </Button>
